@@ -87,7 +87,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
 
       <form
         onSubmit={(e) => { e.preventDefault(); send(text); }}
-        className="sticky bottom-4 mt-6 grid grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-3xl border bg-card p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring"
+        className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-3xl border bg-card p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring"
       >
         <input
           aria-label="Tu mensaje"
