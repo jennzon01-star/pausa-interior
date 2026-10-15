@@ -17,7 +17,7 @@ export function TopicPage({ slug }: { slug: TopicSlug }) {
     setMsgs((m) => [...m, { from: "user", text: v }]);
     setText("");
     setTimeout(() => {
-      const reply = topic.replies[idx.current % topic.replies.length];
+      const reply = topic.replies[idx.current % topic.replies.length] ?? "";
       idx.current++;
       setMsgs((m) => [...m, { from: "app", text: reply }]);
     }, 900);
