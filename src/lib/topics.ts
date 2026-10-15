@@ -67,7 +67,11 @@ export const topics: Topic[] = [
   },
 ];
 
-export const getTopic = (slug: TopicSlug) => topics.find((t) => t.slug === slug)!;
+export const getTopic = (slug: TopicSlug): Topic => {
+  const topic = topics.find((t) => t.slug === slug);
+  if (!topic) throw new Error("Opción de demostración no disponible");
+  return topic;
+};
 
 // Memoria temporal solo en la pestaña (no se guarda nada).
 let pendingMessage = "";
