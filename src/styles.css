@@ -79,3 +79,7 @@
   50% { transform: scale(1); }
 }
 @utility animate-breathe { animation: breathe 10s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-breathe { animation: none; }
+}
