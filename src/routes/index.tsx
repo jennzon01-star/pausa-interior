@@ -41,7 +41,7 @@ function Index() {
         {topics.map((t) => (
           <Link
             key={t.slug}
-            to={`/${t.slug}`}
+            to={`/${t.slug}` as const}
             className="group rounded-3xl border bg-card p-6 shadow-sm transition hover:-translate-y-1 hover:bg-accent"
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-2xl">

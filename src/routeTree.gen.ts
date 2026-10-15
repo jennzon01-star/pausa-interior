@@ -10,33 +10,92 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BienestarRouteImport } from './routes/bienestar'
+import { Route as CalmaRouteImport } from './routes/calma'
+import { Route as ConversarRouteImport } from './routes/conversar'
+import { Route as DificultadRouteImport } from './routes/dificultad'
+import { Route as EmocionesRouteImport } from './routes/emociones'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BienestarRoute = BienestarRouteImport.update({
+  id: '/bienestar',
+  path: '/bienestar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalmaRoute = CalmaRouteImport.update({
+  id: '/calma',
+  path: '/calma',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConversarRoute = ConversarRouteImport.update({
+  id: '/conversar',
+  path: '/conversar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DificultadRoute = DificultadRouteImport.update({
+  id: '/dificultad',
+  path: '/dificultad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmocionesRoute = EmocionesRouteImport.update({
+  id: '/emociones',
+  path: '/emociones',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bienestar': typeof BienestarRoute
+  '/calma': typeof CalmaRoute
+  '/conversar': typeof ConversarRoute
+  '/dificultad': typeof DificultadRoute
+  '/emociones': typeof EmocionesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bienestar': typeof BienestarRoute
+  '/calma': typeof CalmaRoute
+  '/conversar': typeof ConversarRoute
+  '/dificultad': typeof DificultadRoute
+  '/emociones': typeof EmocionesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bienestar': typeof BienestarRoute
+  '/calma': typeof CalmaRoute
+  '/conversar': typeof ConversarRoute
+  '/dificultad': typeof DificultadRoute
+  '/emociones': typeof EmocionesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/bienestar' | '/calma' | '/conversar' | '/dificultad' | '/emociones'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    '/' | '/bienestar' | '/calma' | '/conversar' | '/dificultad' | '/emociones'
+  id:
+    | '__root__'
+    | '/'
+    | '/bienestar'
+    | '/calma'
+    | '/conversar'
+    | '/dificultad'
+    | '/emociones'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BienestarRoute: typeof BienestarRoute
+  CalmaRoute: typeof CalmaRoute
+  ConversarRoute: typeof ConversarRoute
+  DificultadRoute: typeof DificultadRoute
+  EmocionesRoute: typeof EmocionesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +107,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bienestar': {
+      id: '/bienestar'
+      path: '/bienestar'
+      fullPath: '/bienestar'
+      preLoaderRoute: typeof BienestarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calma': {
+      id: '/calma'
+      path: '/calma'
+      fullPath: '/calma'
+      preLoaderRoute: typeof CalmaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conversar': {
+      id: '/conversar'
+      path: '/conversar'
+      fullPath: '/conversar'
+      preLoaderRoute: typeof ConversarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dificultad': {
+      id: '/dificultad'
+      path: '/dificultad'
+      fullPath: '/dificultad'
+      preLoaderRoute: typeof DificultadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/emociones': {
+      id: '/emociones'
+      path: '/emociones'
+      fullPath: '/emociones'
+      preLoaderRoute: typeof EmocionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BienestarRoute: BienestarRoute,
+  CalmaRoute: CalmaRoute,
+  ConversarRoute: ConversarRoute,
+  DificultadRoute: DificultadRoute,
+  EmocionesRoute: EmocionesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
