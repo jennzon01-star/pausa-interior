@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { appendDemoTurn, respondWithDemo, type ConversationMessage } from "@/lib/conversation";
 
-const reply = (content: string) => respondWithDemo({ topic: "conversar", messages: [{ id: "user", role: "user", content }] });
+const reply = (content: string) =>
+  respondWithDemo({ topic: "conversar", messages: [{ id: "user", role: "user", content }] });
 
 describe("Offline conversation", () => {
   it("talks naturally about the garden rather than assuming distress", () => {
@@ -18,7 +19,9 @@ describe("Offline conversation", () => {
     expect(reply("No quiero ayuda, me preocupa mi trabajo")).not.toContain("opciones");
   });
   it("does not assume a category determines emotional state", () => {
-    const messages: ConversationMessage[] = [{ id: "user", role: "user", content: "Hoy cociné pan" }];
+    const messages: ConversationMessage[] = [
+      { id: "user", role: "user", content: "Hoy cociné pan" },
+    ];
     expect(respondWithDemo({ topic: "dificultad", messages })).toContain("preparaste");
     expect(reply("No estoy triste, solo quiero conversar")).not.toContain("preocupa");
   });
@@ -33,7 +36,9 @@ describe("Offline conversation", () => {
     expect(reply("Estoy organizando una colección de sellos")).toContain("respuestas limitadas");
   });
   it("passes the full history to the replaceable responder and does not mutate it", () => {
-    const initial: ConversationMessage[] = [{ id: "intro", role: "assistant", content: "Hola", source: "demo" }];
+    const initial: ConversationMessage[] = [
+      { id: "intro", role: "assistant", content: "Hola", source: "demo" },
+    ];
     const responder = vi.fn(() => "Respuesta de prueba");
     const next = appendDemoTurn(initial, "  Hola  ", "conversar", responder);
     expect(responder).toHaveBeenCalledWith({ topic: "conversar", messages: next.slice(0, -1) });
