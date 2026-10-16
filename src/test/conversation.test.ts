@@ -32,6 +32,11 @@ describe("Offline conversation", () => {
     expect(next.at(-1)?.content).not.toContain("?");
     expect(next.at(-1)?.source).toBe("demo");
   });
+  it("follows the documented behavior examples", () => {
+    expect(reply("No sé qué me pasa")).toMatch(/sin prisa|sin presión/);
+    expect(reply("Solo quiero conversar")).toContain("onvers");
+    expect(reply("Hoy estuve trabajando en mi jardín y me sentí muy bien")).toContain("jardín");
+  });
   it("is honest when no prepared response fits", () => {
     expect(reply("Estoy organizando una colección de sellos")).toContain("respuestas limitadas");
   });

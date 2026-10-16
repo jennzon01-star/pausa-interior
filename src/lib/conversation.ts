@@ -51,6 +51,16 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
       text,
     ) && !/\bno (?:quiero|necesito|busco|pido) (?:\w+ )?ayuda\b/.test(text);
 
+  if (/\bno se (?:que|lo que) me pasa\b/.test(text))
+    return choose([
+      "Está bien no tenerlo claro. No hace falta ponerle nombre ahora; puedes contar lo que vaya saliendo, sin prisa.",
+      "A veces cuesta explicar lo que pasa por dentro. Aquí hay espacio para ir despacio, sin presión.",
+    ]);
+  if (/\bsolo quiero (?:conversar|hablar|charlar)\b/.test(text))
+    return choose([
+      "Claro, conversemos. Puedes empezar por lo que te apetezca, por pequeño que sea.",
+      "Me parece bien. Hay espacio para hablar de cualquier cosa, sin que tenga que llevar a ningún lado.",
+    ]);
   if (help)
     return choose([
       garden
