@@ -1,4 +1,5 @@
 import type { TopicSlug } from "@/lib/topics";
+import { conversationPrinciples } from "@/lib/conversation-principles";
 
 export type ConversationMessage = {
   id: string;
@@ -14,14 +15,7 @@ export type ConversationResponder = (request: {
   messages: readonly ConversationMessage[];
 }) => string;
 
-export const conversationGuidelines = [
-  "Responder al contenido concreto, con naturalidad, respeto, calidez y honestidad.",
-  "Conversar sobre experiencias agradables sin convertirlas en terapia.",
-  "Reconocer preocupaciones sin juzgar ni imponer soluciones.",
-  "No asumir tristeza, soledad ni necesidad de ayuda emocional.",
-  "No terminar siempre con preguntas; dejar espacio para continuar.",
-  "Explorar opciones sin imponerlas cuando la persona pide ayuda.",
-] as const;
+export const conversationGuidelines = conversationPrinciples.map((p) => p.rule);
 
 const normalize = (text: string) =>
   text
