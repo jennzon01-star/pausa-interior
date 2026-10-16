@@ -1,4 +1,5 @@
 import type { TopicSlug } from "@/lib/topics";
+import { conversationPrinciples } from "@/lib/conversation-principles";
 
 export type ConversationMessage = {
   id: string;
@@ -14,14 +15,7 @@ export type ConversationResponder = (request: {
   messages: readonly ConversationMessage[];
 }) => string;
 
-export const conversationGuidelines = [
-  "Responder al contenido concreto, con naturalidad, respeto, calidez y honestidad.",
-  "Conversar sobre experiencias agradables sin convertirlas en terapia.",
-  "Reconocer preocupaciones sin juzgar ni imponer soluciones.",
-  "No asumir tristeza, soledad ni necesidad de ayuda emocional.",
-  "No terminar siempre con preguntas; dejar espacio para continuar.",
-  "Explorar opciones sin imponerlas cuando la persona pide ayuda.",
-] as const;
+export const conversationGuidelines = conversationPrinciples.map((p) => p.rule);
 
 const normalize = (text: string) =>
   text
@@ -57,6 +51,16 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
       text,
     ) && !/\bno (?:quiero|necesito|busco|pido) (?:\w+ )?ayuda\b/.test(text);
 
+  if (/\bno se (?:que|lo que) me pasa\b/.test(text))
+    return choose([
+      "Está bien no tenerlo claro. No hace falta ponerle nombre ahora; puedes contar lo que vaya saliendo, sin prisa.",
+      "A veces cuesta explicar lo que pasa por dentro. Aquí hay espacio para ir despacio, sin presión.",
+    ]);
+  if (/\bsolo quiero (?:conversar|hablar|charlar)\b/.test(text))
+    return choose([
+      "Claro, conversemos. Puedes empezar por lo que te apetezca, por pequeño que sea.",
+      "Me parece bien. Hay espacio para hablar de cualquier cosa, sin que tenga que llevar a ningún lado.",
+    ]);
   if (help)
     return choose([
       garden
