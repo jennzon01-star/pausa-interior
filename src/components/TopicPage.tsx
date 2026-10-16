@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topics";
-import { Button } from "@/components/ui/button";
 import { TopicIcon } from "@/components/TopicIcon";
-
-type Msg = { from: "user" | "app"; text: string };
+import { ArrowUp } from "lucide-react";
+import { Conversation, ConversationContent, ConversationScrollButton } from "@/components/ai-elements/conversation";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import { PromptInput, PromptInputTextarea, PromptInputFooter, PromptInputSubmit } from "@/components/ai-elements/prompt-input";
+import { appendDemoTurn, type ConversationMessage } from "@/lib/conversation";
 
 export function TopicPage({ slug }: { slug: TopicSlug }) {
   return <TopicConversation key={slug} slug={slug} />;
@@ -12,28 +14,20 @@ export function TopicPage({ slug }: { slug: TopicSlug }) {
 
 function TopicConversation({ slug }: { slug: TopicSlug }) {
   const topic = getTopic(slug);
-  const [msgs, setMsgs] = useState<Msg[]>([{ from: "app", text: topic.intro }]);
+  const [msgs, setMsgs] = useState<ConversationMessage[]>([{ id: "intro", role: "assistant", content: topic.intro, source: "demo" }]);
   const [text, setText] = useState("");
-  const idx = useRef(0);
-  const end = useRef<HTMLDivElement>(null);
 
   const send = (value: string) => {
     const v = value.trim();
     if (!v) return;
-    const reply = topic.replies[idx.current % topic.replies.length] ?? topic.intro;
-    idx.current++;
-    setMsgs((m) => [...m, { from: "user", text: v }, { from: "app", text: reply }]);
+    setMsgs((m) => appendDemoTurn(m, v, slug));
     setText("");
   };
 
   useEffect(() => {
     const p = takePendingMessage();
-    if (p) send(p);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => {
-    if (msgs.length > 1) end.current?.scrollIntoView({ behavior: "instant", block: "nearest" });
-  }, [msgs]);
+    if (p) setMsgs((m) => appendDemoTurn(m, p, slug));
+  }, [slug]);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col px-5 py-8">
@@ -67,42 +61,39 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         </div>
       )}
 
-      <section role="log" aria-label="Conversación de demostración" aria-live="polite" className="mt-6 flex-1 space-y-3">
+      <Conversation aria-label="Conversación de demostración" aria-live="polite" initial="instant" resize="instant" className="mt-6 h-[min(52dvh,32rem)] min-h-64 flex-none">
+        <ConversationContent className="gap-6 px-0 py-3">
         {msgs.map((m, i) => (
-          <div key={i} className={m.from === "user" ? "flex justify-end" : "flex"}>
-            <p
-              className={
-                m.from === "user"
-                  ? "max-w-[90%] whitespace-pre-wrap [overflow-wrap:anywhere] rounded-2xl rounded-br-md bg-primary px-4 py-3 text-primary-foreground sm:max-w-[80%]"
-                  : "max-w-[90%] whitespace-pre-wrap [overflow-wrap:anywhere] rounded-2xl rounded-bl-md bg-card px-4 py-3 shadow-sm sm:max-w-[80%]"
-              }
-            >
-              {m.from === "app" && <span className="mb-1 block text-xs font-semibold text-primary">Respuesta de demostración · sin IA</span>}
-              {m.text}
-            </p>
-          </div>
+          <Message key={m.id} from={m.role} className="max-w-[92%] sm:max-w-[85%]">
+            {m.role === "assistant" && <span className="flex items-center gap-2 text-xs font-semibold text-primary"><TopicIcon slug={slug} className="size-4 shrink-0" />{i === 0 ? "Pausa Interior · demostración sin IA" : "Respuesta simulada · sin IA"}</span>}
+            <MessageContent className={m.role === "user" ? "whitespace-pre-wrap [overflow-wrap:anywhere] text-base leading-relaxed group-[.is-user]:rounded-2xl group-[.is-user]:rounded-br-md group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground" : "text-base leading-relaxed [overflow-wrap:anywhere]"}>
+              {m.role === "assistant" ? <MessageResponse mode="static" parseIncompleteMarkdown={false}>{m.content}</MessageResponse> : m.content}
+            </MessageContent>
+          </Message>
         ))}
-        <div ref={end} />
-      </section>
+        </ConversationContent>
+        <ConversationScrollButton aria-label="Ver los últimos mensajes" title="Ver los últimos mensajes" />
+      </Conversation>
 
-      <form
-        onSubmit={(e) => { e.preventDefault(); send(text); }}
-        className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-3xl border bg-card p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring"
+      <PromptInput
+        onSubmit={({ text: value }) => send(value)}
+        maxFiles={0}
+        className="mt-6 [&_[data-slot=input-group]]:rounded-3xl [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-sm"
       >
-        <input
+        <PromptInputTextarea
           aria-label="Tu mensaje"
           aria-describedby="conversation-privacy"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Puedes contarme lo que quieras…"
-          className="min-w-0 w-full bg-transparent px-3 outline-none placeholder:text-muted-foreground"
+          className="min-h-20 min-w-0 w-full px-4 text-base outline-none placeholder:text-muted-foreground"
         />
-        <Button type="submit" disabled={!text.trim()} className="h-11 shrink-0 rounded-2xl px-5">
-          Enviar
-        </Button>
-      </form>
+        <PromptInputFooter className="justify-end px-3 pb-3">
+          <PromptInputSubmit status="ready" disabled={!text.trim()} aria-label="Enviar" title="Enviar" className="size-11 shrink-0 rounded-2xl"><ArrowUp className="size-5" /></PromptInputSubmit>
+        </PromptInputFooter>
+      </PromptInput>
       <p id="conversation-privacy" className="mt-3 text-center text-xs leading-relaxed text-secondary-foreground">
-        Versión de demostración · respuestas preescritas, sin IA. No se guardan las conversaciones.
+        Demostración sin IA · frases simuladas según palabras clave; pueden no encajar. No se guardan las conversaciones.
       </p>
     </main>
   );

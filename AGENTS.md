@@ -12,3 +12,5 @@
 - Keep demonstration conversations in React state and the pending home message in tab-local module memory only, so navigation works without storing personal information.
 - Reuse TopicIcon and the shared Button for topic symbols and form actions, so icons render consistently and controls retain accessible focus states.
 - Key each topic conversation by its slug, so changing categories resets the demonstration to the correct introduction and replies.
+- Keep the offline responder in a browser-safe conversation module with a full-history request contract, so a future AI adapter can replace it without changing the presentation or storing messages.
+- Compose the conversation with AI Elements and the shared Button underneath its form actions, so markdown, scrolling and multiline input have consistent accessible foundations.
