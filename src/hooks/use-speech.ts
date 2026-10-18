@@ -52,11 +52,15 @@ export function useDictation(options: {
 }) {
   const [status, setStatus] = useState<DictationStatus>("idle");
   const [interim, setInterim] = useState("");
+  // Se detecta tras el montaje para que el HTML del servidor coincida con el cliente.
+  const [supported, setSupported] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const onFinalRef = useRef(options.onFinalTranscript);
   onFinalRef.current = options.onFinalTranscript;
 
-  const supported = typeof window !== "undefined" && getRecognitionCtor() !== null;
+  useEffect(() => {
+    setSupported(getRecognitionCtor() !== null);
+  }, []);
 
   const stop = useCallback(() => {
     recognitionRef.current?.stop();
@@ -128,8 +132,11 @@ const pickSpanishVoice = (voices: SpeechSynthesisVoice[]) =>
 
 export function useSpeechSynthesis() {
   const [speaking, setSpeaking] = useState(false);
-  const supported =
-    typeof window !== "undefined" && "speechSynthesis" in window;
+  const [supported, setSupported] = useState(false);
+
+  useEffect(() => {
+    setSupported("speechSynthesis" in window);
+  }, []);
 
   const stop = useCallback(() => {
     if (!supported) return;
