@@ -2,7 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topics";
 import { TopicIcon } from "@/components/TopicIcon";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Mic, MicOff, Square, Volume2 } from "lucide-react";
+import { useDictation, useSpeechSynthesis } from "@/hooks/use-speech";
+import { Button } from "@/components/ui/button";
 import {
   Conversation,
   ConversationContent,
