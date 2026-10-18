@@ -207,6 +207,37 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
           </PromptInputSubmit>
         </PromptInputFooter>
       </PromptInput>
+      <div aria-live="polite" className="mt-3 space-y-1">
+        {dictation.status === "listening" && (
+          <p className="text-center text-sm text-primary">
+            Escuchando… habla con calma; el texto aparecerá en el cuadro para que lo revises antes
+            de enviarlo.
+            {dictation.interim && (
+              <span className="block text-muted-foreground">{dictation.interim}</span>
+            )}
+          </p>
+        )}
+        {dictation.status === "unsupported" && (
+          <p className="text-center text-sm text-muted-foreground">
+            Este navegador no admite dictado por voz. Puedes seguir escribiendo tu mensaje con el
+            teclado.
+          </p>
+        )}
+        {dictation.status === "denied" && (
+          <p className="text-center text-sm text-muted-foreground">
+            No se pudo usar el micrófono porque el permiso fue denegado. Puedes activarlo en la
+            configuración del navegador o seguir escribiendo con el teclado.
+          </p>
+        )}
+        {dictation.status === "error" && (
+          <p className="text-center text-sm text-muted-foreground">
+            El dictado por voz se interrumpió. Puedes intentarlo de nuevo o escribir tu mensaje.
+          </p>
+        )}
+        {speech.speaking && (
+          <p className="text-center text-sm text-primary">Reproduciendo respuesta en voz alta…</p>
+        )}
+      </div>
       <p
         id="conversation-privacy"
         className="mt-3 text-center text-xs leading-relaxed text-secondary-foreground"
