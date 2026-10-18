@@ -29,12 +29,22 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     { id: "intro", role: "assistant", content: topic.intro, source: "demo" },
   ]);
   const [text, setText] = useState("");
+  const speech = useSpeechSynthesis();
+  const dictation = useDictation({
+    onFinalTranscript: (t) => setText((prev) => (prev ? `${prev} ${t}` : t)),
+  });
 
   const send = (value: string) => {
     const v = value.trim();
     if (!v) return;
+    if (dictation.status === "listening") dictation.stop();
     setMsgs((m) => appendDemoTurn(m, v, slug));
     setText("");
+  };
+
+  const toggleDictation = () => {
+    if (dictation.status === "listening") dictation.stop();
+    else dictation.start();
   };
 
   useEffect(() => {
