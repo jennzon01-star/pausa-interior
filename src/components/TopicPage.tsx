@@ -104,6 +104,19 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                 <span className="flex items-center gap-2 text-xs font-semibold text-primary">
                   <TopicIcon slug={slug} className="size-4 shrink-0" />
                   {i === 0 ? "Pausa Interior · demostración sin IA" : "Respuesta simulada · sin IA"}
+                  {speech.supported && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => speech.speak(m.content)}
+                      aria-label={`Escuchar respuesta ${i + 1} en voz alta`}
+                      title="Escuchar en voz alta"
+                      className="h-6 gap-1 px-2 text-xs font-normal text-muted-foreground"
+                    >
+                      <Volume2 className="size-3.5" /> Escuchar
+                    </Button>
+                  )}
                 </span>
               )}
               <MessageContent
@@ -143,7 +156,46 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
           placeholder="Puedes contarme lo que quieras…"
           className="min-h-20 min-w-0 w-full px-4 text-base outline-none placeholder:text-muted-foreground"
         />
-        <PromptInputFooter className="justify-end px-3 pb-3">
+        <PromptInputFooter className="justify-end gap-2 px-3 pb-3">
+          {dictation.supported && (
+            <Button
+              type="button"
+              variant={dictation.status === "listening" ? "default" : "outline"}
+              size="icon"
+              onClick={toggleDictation}
+              aria-label={
+                dictation.status === "listening"
+                  ? "Detener dictado por voz"
+                  : "Dictar mensaje por voz"
+              }
+              aria-pressed={dictation.status === "listening"}
+              title={
+                dictation.status === "listening"
+                  ? "Detener dictado por voz"
+                  : "Dictar mensaje por voz"
+              }
+              className="size-11 shrink-0 rounded-2xl"
+            >
+              {dictation.status === "listening" ? (
+                <MicOff className="size-5" />
+              ) : (
+                <Mic className="size-5" />
+              )}
+            </Button>
+          )}
+          {speech.speaking && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={speech.stop}
+              aria-label="Detener la reproducción hablada"
+              title="Detener la reproducción hablada"
+              className="size-11 shrink-0 rounded-2xl"
+            >
+              <Square className="size-5" />
+            </Button>
+          )}
           <PromptInputSubmit
             status="ready"
             disabled={!text.trim()}
