@@ -2,7 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topics";
 import { TopicIcon } from "@/components/TopicIcon";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Mic, MicOff, Square, Volume2 } from "lucide-react";
+import { useDictation, useSpeechSynthesis } from "@/hooks/use-speech";
+import { Button } from "@/components/ui/button";
 import {
   Conversation,
   ConversationContent,
@@ -27,12 +29,22 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     { id: "intro", role: "assistant", content: topic.intro, source: "demo" },
   ]);
   const [text, setText] = useState("");
+  const speech = useSpeechSynthesis();
+  const dictation = useDictation({
+    onFinalTranscript: (t) => setText((prev) => (prev ? `${prev} ${t}` : t)),
+  });
 
   const send = (value: string) => {
     const v = value.trim();
     if (!v) return;
+    if (dictation.status === "listening") dictation.stop();
     setMsgs((m) => appendDemoTurn(m, v, slug));
     setText("");
+  };
+
+  const toggleDictation = () => {
+    if (dictation.status === "listening") dictation.stop();
+    else dictation.start();
   };
 
   useEffect(() => {
@@ -92,6 +104,19 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                 <span className="flex items-center gap-2 text-xs font-semibold text-primary">
                   <TopicIcon slug={slug} className="size-4 shrink-0" />
                   {i === 0 ? "Pausa Interior · demostración sin IA" : "Respuesta simulada · sin IA"}
+                  {speech.supported && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => speech.speak(m.content)}
+                      aria-label={`Escuchar respuesta ${i + 1} en voz alta`}
+                      title="Escuchar en voz alta"
+                      className="h-6 gap-1 px-2 text-xs font-normal text-muted-foreground"
+                    >
+                      <Volume2 className="size-3.5" /> Escuchar
+                    </Button>
+                  )}
                 </span>
               )}
               <MessageContent
@@ -131,7 +156,46 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
           placeholder="Puedes contarme lo que quieras…"
           className="min-h-20 min-w-0 w-full px-4 text-base outline-none placeholder:text-muted-foreground"
         />
-        <PromptInputFooter className="justify-end px-3 pb-3">
+        <PromptInputFooter className="justify-end gap-2 px-3 pb-3">
+          {dictation.supported && (
+            <Button
+              type="button"
+              variant={dictation.status === "listening" ? "default" : "outline"}
+              size="icon"
+              onClick={toggleDictation}
+              aria-label={
+                dictation.status === "listening"
+                  ? "Detener dictado por voz"
+                  : "Dictar mensaje por voz"
+              }
+              aria-pressed={dictation.status === "listening"}
+              title={
+                dictation.status === "listening"
+                  ? "Detener dictado por voz"
+                  : "Dictar mensaje por voz"
+              }
+              className="size-11 shrink-0 rounded-2xl"
+            >
+              {dictation.status === "listening" ? (
+                <MicOff className="size-5" />
+              ) : (
+                <Mic className="size-5" />
+              )}
+            </Button>
+          )}
+          {speech.speaking && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={speech.stop}
+              aria-label="Detener la reproducción hablada"
+              title="Detener la reproducción hablada"
+              className="size-11 shrink-0 rounded-2xl"
+            >
+              <Square className="size-5" />
+            </Button>
+          )}
           <PromptInputSubmit
             status="ready"
             disabled={!text.trim()}
@@ -143,6 +207,37 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
           </PromptInputSubmit>
         </PromptInputFooter>
       </PromptInput>
+      <div aria-live="polite" className="mt-3 space-y-1">
+        {dictation.status === "listening" && (
+          <p className="text-center text-sm text-primary">
+            Escuchando… habla con calma; el texto aparecerá en el cuadro para que lo revises antes
+            de enviarlo.
+            {dictation.interim && (
+              <span className="block text-muted-foreground">{dictation.interim}</span>
+            )}
+          </p>
+        )}
+        {dictation.status === "unsupported" && (
+          <p className="text-center text-sm text-muted-foreground">
+            Este navegador no admite dictado por voz. Puedes seguir escribiendo tu mensaje con el
+            teclado.
+          </p>
+        )}
+        {dictation.status === "denied" && (
+          <p className="text-center text-sm text-muted-foreground">
+            No se pudo usar el micrófono porque el permiso fue denegado. Puedes activarlo en la
+            configuración del navegador o seguir escribiendo con el teclado.
+          </p>
+        )}
+        {dictation.status === "error" && (
+          <p className="text-center text-sm text-muted-foreground">
+            El dictado por voz se interrumpió. Puedes intentarlo de nuevo o escribir tu mensaje.
+          </p>
+        )}
+        {speech.speaking && (
+          <p className="text-center text-sm text-primary">Reproduciendo respuesta en voz alta…</p>
+        )}
+      </div>
       <p
         id="conversation-privacy"
         className="mt-3 text-center text-xs leading-relaxed text-secondary-foreground"
