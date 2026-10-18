@@ -103,9 +103,9 @@ export function useDictation(options: {
 
     recognitionRef.current = recognition;
     try {
-      recognition.start();
       setStatus("listening");
       setInterim("");
+      recognition.start();
     } catch {
       setStatus("error");
     }
@@ -158,7 +158,7 @@ export function useSpeechSynthesis() {
     if (!supported) return;
     // Algunos navegadores cargan las voces de forma asíncrona.
     window.speechSynthesis.getVoices();
-    return () => window.speechSynthesis.cancel();
+    return () => window.speechSynthesis?.cancel();
   }, [supported]);
 
   return { supported, speaking, speak, stop };

@@ -91,6 +91,20 @@ describe("Síntesis de voz", () => {
       speak: (u: SpeechSynthesisUtterance) => spoken.push(u),
       cancel: () => {},
     });
+    vi.stubGlobal(
+      "SpeechSynthesisUtterance",
+      class {
+        text: string;
+        lang = "";
+        rate = 1;
+        voice: SpeechSynthesisVoice | null = null;
+        onend: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        constructor(text: string) {
+          this.text = text;
+        }
+      },
+    );
     const { result } = renderHook(() => useSpeechSynthesis());
     expect(result.current.supported).toBe(true);
     act(() => result.current.speak("Respira con calma"));
