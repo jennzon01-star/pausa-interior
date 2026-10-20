@@ -40,16 +40,9 @@ const getRecognitionCtor = (): SpeechRecognitionCtor | null => {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 };
 
-export type DictationStatus =
-  | "idle"
-  | "listening"
-  | "unsupported"
-  | "denied"
-  | "error";
+export type DictationStatus = "idle" | "listening" | "unsupported" | "denied" | "error";
 
-export function useDictation(options: {
-  onFinalTranscript: (text: string) => void;
-}) {
+export function useDictation(options: { onFinalTranscript: (text: string) => void }) {
   const [status, setStatus] = useState<DictationStatus>("idle");
   const [interim, setInterim] = useState("");
   // Se detecta tras el montaje para que el HTML del servidor coincida con el cliente.
@@ -125,7 +118,7 @@ export function useDictation(options: {
   return { supported, status, interim, start, stop };
 }
 
-const pickSpanishVoice = (voices: SpeechSynthesisVoice[]) =>
+export const pickSpanishVoice = (voices: SpeechSynthesisVoice[]) =>
   voices.find((v) => v.lang.toLowerCase().startsWith("es") && v.localService) ??
   voices.find((v) => v.lang.toLowerCase().startsWith("es")) ??
   null;

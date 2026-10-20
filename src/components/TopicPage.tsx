@@ -4,6 +4,7 @@ import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topi
 import { TopicIcon } from "@/components/TopicIcon";
 import { ArrowUp, Mic, MicOff, RotateCcw, Square, Volume2 } from "lucide-react";
 import { useDictation, useSpeechSynthesis } from "@/hooks/use-speech";
+import { useMindfulnessBreathingVoice } from "@/hooks/use-mindfulness";
 import { Button } from "@/components/ui/button";
 import {
   Conversation,
@@ -57,6 +58,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
   const lastReplySource = msgs.length > 1 ? msgs.at(-1)?.source : undefined;
   const demoMode = lastReplySource === "demo";
   const speech = useSpeechSynthesis();
+  const mindfulness = useMindfulnessBreathingVoice();
   const dictation = useDictation({
     onFinalTranscript: (t) => setText((prev) => (prev ? `${prev} ${t}` : t)),
   });
@@ -64,6 +66,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
   const resetConversation = () => {
     if (dictation.status === "listening") dictation.stop();
     if (speech.speaking) speech.stop();
+    if (mindfulness.isActive) mindfulness.stop();
     setMsgs([{ id: "intro", role: "assistant", content: topic.intro, source: "demo" }]);
     setText("");
   };
@@ -144,11 +147,67 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
       <h1 className="mt-8 text-3xl text-foreground">{topic.title}</h1>
 
       {slug === "calma" && (
-        <div className="my-8 flex justify-center">
-          <div className="flex h-48 w-48 items-center justify-center rounded-full bg-accent">
+        <section
+          aria-label="Guía de respiración y mindfulness"
+          className="my-8 flex flex-col items-center justify-center gap-5 rounded-3xl border bg-card/60 p-6 text-center shadow-sm backdrop-blur-xs"
+        >
+          <div className="relative flex h-52 w-52 items-center justify-center rounded-full bg-accent/70 shadow-inner">
             <div className="animate-breathe h-40 w-40 rounded-full bg-sage/70" />
+            <span
+              aria-live="polite"
+              className="absolute text-center font-serif text-sm font-semibold tracking-wide text-primary-foreground drop-shadow-xs select-none"
+            >
+              {mindfulness.isActive
+                ? mindfulness.phase === "inhale"
+                  ? "Inhala"
+                  : "Exhala"
+                : "Respira"}
+            </span>
           </div>
-        </div>
+
+          <div className="min-h-12 max-w-md px-2" aria-live="polite">
+            {mindfulness.isActive ? (
+              <p className="text-base font-medium text-primary">{mindfulness.phaseText}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Sigue la voz y el ritmo del círculo para inhalar y exhalar con calma.
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col items-center gap-2">
+            {mindfulness.isActive ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={mindfulness.stop}
+                aria-label="Terminar ejercicio de respiración guiada"
+                className="h-12 gap-2 rounded-full border-primary/40 px-6 font-medium text-foreground hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
+              >
+                <Square className="size-4 shrink-0 fill-current" />
+                <span>Terminar cuando quieras</span>
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="default"
+                size="lg"
+                onClick={mindfulness.start}
+                aria-label="Iniciar guía de respiración consciente con voz"
+                className="h-12 gap-2 rounded-full px-6 font-medium shadow-sm"
+              >
+                <Volume2 className="size-5 shrink-0" />
+                <span>Iniciar guía con voz</span>
+              </Button>
+            )}
+            {mindfulness.isActive && (
+              <span className="text-xs text-muted-foreground">
+                Ciclo {mindfulness.cycleCount + 1} · Decide con libertad cuándo terminar
+              </span>
+            )}
+          </div>
+        </section>
       )}
 
       <Conversation
