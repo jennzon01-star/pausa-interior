@@ -58,69 +58,69 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
 
   if (/\bno se (?:que|lo que) me pasa\b/.test(text))
     return choose([
-      "Está bien no tenerlo claro. No hace falta ponerle nombre ahora; puedes contar lo que vaya saliendo, sin prisa.",
-      "A veces cuesta explicar lo que pasa por dentro. Aquí hay espacio para ir despacio, sin presión.",
+      "Está bien no tenerlo claro. Puedes ir con calma y sin prisa, aquí te leo.",
+      "A veces cuesta encontrar las palabras exactas. Vamos despacio, sin presión.",
     ]);
   if (/\bsolo quiero (?:conversar|hablar|charlar)\b/.test(text))
     return choose([
-      "Claro, conversemos. Puedes empezar por lo que te apetezca, por pequeño que sea.",
-      "Me parece bien. Hay espacio para hablar de cualquier cosa, sin que tenga que llevar a ningún lado.",
+      "Claro, conversemos tranquilamente de lo que te apetezca hoy.",
+      "Me parece un gran plan. Aquí hay espacio para charlar sin apuros.",
     ]);
   if (help)
     return choose([
       garden
-        ? "Podemos explorar opciones para tu jardín, sin decidir por ti. ¿Qué te gustaría resolver con las plantas?"
+        ? "Podemos mirar opciones para tus plantas sin complicarte la vida."
         : work
-          ? "Podemos mirar opciones para esa situación en el trabajo. ¿Qué te gustaría resolver primero?"
-          : "Podemos explorar algunas opciones, sin que tengas que elegir ninguna ahora. ¿Qué parte te gustaría resolver primero?",
-      "Podemos separar lo que está en tus manos de lo que no, y mirar las alternativas que te resulten posibles. Tú decides si alguna encaja.",
-      "Si quieres, podemos comparar las opciones que ya tienes en mente, con lo que te atrae y lo que te preocupa de cada una.",
+          ? "Podemos revisar algunas opciones para el trabajo con calma y paso a paso."
+          : "Podemos revisar juntos algunas opciones sencillas para ver qué te resulta más viable.",
+      "A veces ayuda separar lo que depende de ti de lo que no, y revisar alternativas posibles.",
+      "Podemos comparar las opciones que ya tengas en mente, viendo con calma los pros y contras de cada una.",
     ]);
   if (worry)
     return choose([
       garden
-        ? "Mencionas una preocupación con tu jardín. No hace falta buscar una solución enseguida; puedes contar qué está pasando con las plantas."
+        ? "Entiendo la preocupación por las plantas de tu jardín. Cuidar de ellas a veces trae momentos así."
         : work
-          ? "Mencionas una preocupación relacionada con el trabajo. Podemos quedarnos en lo que te inquieta, sin apresurarnos a buscar soluciones."
-          : "Mencionas algo que te preocupa. Puedes hablar de ello sin tener que justificar lo que sientes ni resolverlo ahora.",
-      "No hace falta quitarle importancia a esa preocupación ni encontrar una respuesta de inmediato. Hay espacio para contar lo que pasa a tu ritmo.",
-      "Gracias por poner esa preocupación en palabras. No voy a decirte cómo deberías sentirte ni qué tienes que hacer.",
+          ? "Se entiende esa preocupación por el trabajo. Cosas del día a día laboral que a veces se sienten pesadas."
+          : "Tiene sentido que te preocupe. A veces simplemente viene bien soltarlo y ponerlo en palabras.",
+      "No hace falta quitarle peso ni buscarle una solución apresurada a esa preocupación.",
+      "Gracias por comentarlo con sinceridad. Te leo con atención y sin juzgar.",
     ]);
   if (garden)
     return choose([
-      "El jardín tiene muchos pequeños detalles: lo que crece, los colores, la tierra. ¿Qué estuviste haciendo entre tus plantas?",
-      "Trabajar en el jardín puede dar lugar a historias muy distintas, desde una nueva flor hasta algo que se está intentando cultivar. Puedes seguir contando sobre el tuyo.",
-      "Cada planta tiene su propio ritmo. Me quedo en ese tema contigo, sin llevar la conversación a otra cosa.",
+      "Estar en el jardín desconecta bastante. Cuidar la tierra y las plantas siempre tiene su encanto.",
+      "Trabajar en el jardín da para muchas cosas: ver brotar algo nuevo, podar o simplemente pasar el rato.",
+      "Cada planta va a su propio ritmo y estar ahí ayuda a bajar revoluciones.",
     ]);
   if (/\b(cocinar|cocine|cocinando|receta|pan|comida)\b/.test(text))
     return choose([
-      "Hay mucho que contar alrededor de una receta: sabores, ingredientes y pequeños cambios. ¿Qué preparaste?",
-      "Una receta también puede tener una historia propia. Puedes contar cómo quedó o qué le pusiste de tu parte.",
+      "Cocinar algo rico siempre alegra el día. Qué bueno lo que preparaste hoy.",
+      "Hacer una receta propia o improvisar en la cocina siempre tiene su toque especial.",
     ]);
   if (/\b(musica|cancion|canciones|concierto|guitarra)\b/.test(text))
     return choose([
-      "La música da para conversar de sonidos, canciones y recuerdos. ¿Qué estuviste escuchando o tocando?",
-      "Podemos seguir hablando de esa música, sin buscarle un significado más allá de lo que quieras contar.",
+      "La música cambia el ánimo por completo y acompaña muy bien cualquier momento.",
+      "Qué buen tema. Hablar de música siempre es agradable y relajante.",
     ]);
   if (work)
     return choose([
-      "Podemos hablar de tu trabajo tal como fue hoy, sin dar por hecho que haya sido un día bueno o malo. ¿Qué te gustaría contar?",
-      "El trabajo ocupa una parte del día, pero cada experiencia es distinta. Puedes seguir contando la tuya.",
+      "El trabajo tiene sus días buenos y sus días pesados. Es muy normal.",
+      "El trabajo ocupa buena parte del tiempo, pero cada jornada deja algo distinto.",
     ]);
   if (/\b(content\w*|feliz|alegr\w*|disfrut\w*|agradable|me gusto|me encanta)\b/.test(text))
     return choose([
-      "Qué gusto que compartas algo que disfrutaste. Podemos quedarnos en esa experiencia, sin tener que convertirla en nada más.",
-      "También hay espacio para hablar de lo agradable y de los pequeños detalles de un buen momento.",
+      "Qué alegría leer eso. Da gusto cuando algo sale bien o se disfruta el momento.",
+      "Compartir los momentos agradables siempre suma un montón de buena energía.",
     ]);
   if (/^(hola|buenas|buenos dias|buenas tardes)[!.,\s]*$/.test(text))
     return choose([
-      "Hola. Puedes conversar de algo cotidiano, una idea o lo que te apetezca compartir.",
-      "Hola de nuevo. Hay espacio para el tema que tú elijas.",
+      "Hola. Qué bueno verte por acá. Cuéntame lo que tengas ganas de compartir.",
+      "Hola de nuevo. Aquí estoy para charlar un rato con calma.",
     ]);
   return choose([
-    "Esta demostración tiene respuestas limitadas y puede no encajar con lo que cuentas. Puedes seguir con tu tema; no voy a dar por hecho cómo te sientes.",
-    "Puedes continuar a tu ritmo. Si esta respuesta no encaja, es una limitación de las frases simuladas, no de lo que has compartido.",
-    "No tengo una respuesta específica preparada para ese detalle. Prefiero decirlo con honestidad antes que atribuirte una emoción o inventar una explicación.",
+    "Esta demostración tiene respuestas limitadas y automáticas, pero te sigo leyendo con atención.",
+    "Como es una demo con respuestas limitadas, tal vez esta frase sea sencilla, pero te acompaño.",
+    "No tengo una respuesta exacta guardada para eso en esta demo, pero puedes seguir contándome.",
   ]);
 };
 

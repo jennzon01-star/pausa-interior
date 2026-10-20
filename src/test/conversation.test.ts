@@ -46,6 +46,11 @@ describe("Offline conversation", () => {
   it("is honest when no prepared response fits", () => {
     expect(reply("Estoy organizando una colección de sellos")).toContain("respuestas limitadas");
   });
+  it("avoids automatic questions at the end of everyday responses", () => {
+    expect(reply("Hoy cociné pan")).not.toContain("?");
+    expect(reply("Estuve escuchando música")).not.toContain("?");
+    expect(reply("Hoy tuve mucho trabajo")).not.toContain("?");
+  });
   it("passes the full history to the replaceable responder and does not mutate it", () => {
     const initial: ConversationMessage[] = [
       { id: "intro", role: "assistant", content: "Hola", source: "demo" },
