@@ -17,7 +17,31 @@ import {
   PromptInputFooter,
   PromptInputSubmit,
 } from "@/components/ai-elements/prompt-input";
-import { appendDemoTurn, type ConversationMessage } from "@/lib/conversation";
+import {
+  appendAssistantMessage,
+  appendUserMessage,
+  respondWithDemo,
+  type ConversationMessage,
+  type ConversationReply,
+} from "@/lib/conversation";
+import { sendChatTurn } from "@/lib/chat.functions";
+
+async function requestReply(
+  topic: TopicSlug,
+  history: readonly ConversationMessage[],
+): Promise<ConversationReply> {
+  try {
+    return await sendChatTurn({
+      data: {
+        topic,
+        messages: history.map(({ role, content }) => ({ role, content })),
+      },
+    });
+  } catch {
+    // Server unreachable or input rejected: stay usable with the offline responder.
+    return { reply: respondWithDemo({ topic, messages: history }), source: "demo" };
+  }
+}
 
 export function TopicPage({ slug }: { slug: TopicSlug }) {
   return <TopicConversation key={slug} slug={slug} />;
@@ -29,17 +53,30 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     { id: "intro", role: "assistant", content: topic.intro, source: "demo" },
   ]);
   const [text, setText] = useState("");
+  const [pending, setPending] = useState(false);
+  const lastReplySource = msgs.length > 1 ? msgs.at(-1)?.source : undefined;
+  const demoMode = lastReplySource === "demo";
   const speech = useSpeechSynthesis();
   const dictation = useDictation({
     onFinalTranscript: (t) => setText((prev) => (prev ? `${prev} ${t}` : t)),
   });
 
+  const ask = async (value: string, current: readonly ConversationMessage[]) => {
+    const history = appendUserMessage(current, value);
+    if (history.length === current.length) return;
+    setMsgs(history);
+    setPending(true);
+    const { reply, source } = await requestReply(slug, history);
+    setMsgs((m) => appendAssistantMessage(m, reply, source));
+    setPending(false);
+  };
+
   const send = (value: string) => {
     const v = value.trim();
-    if (!v) return;
+    if (!v || pending) return;
     if (dictation.status === "listening") dictation.stop();
-    setMsgs((m) => appendDemoTurn(m, v, slug));
     setText("");
+    void ask(v, msgs);
   };
 
   const toggleDictation = () => {
@@ -49,7 +86,8 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
 
   useEffect(() => {
     const p = takePendingMessage();
-    if (p) setMsgs((m) => appendDemoTurn(m, p, slug));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per slug (component is keyed by slug)
+    if (p) void ask(p, msgs);
   }, [slug]);
 
   return (
@@ -62,7 +100,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
           Pausa Interior
         </Link>
         <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground">
-          Modo demostración
+          {demoMode ? "Modo demostración" : "Asistente de IA"}
         </span>
       </header>
 
@@ -91,7 +129,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
       )}
 
       <Conversation
-        aria-label="Conversación de demostración"
+        aria-label="Conversación"
         aria-live="polite"
         initial="instant"
         resize="instant"
@@ -103,7 +141,11 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
               {m.role === "assistant" && (
                 <span className="flex items-center gap-2 text-xs font-semibold text-primary">
                   <TopicIcon slug={slug} className="size-4 shrink-0" />
-                  {i === 0 ? "Pausa Interior · demostración sin IA" : "Respuesta simulada · sin IA"}
+                  {i === 0
+                    ? "Pausa Interior · bienvenida"
+                    : m.source === "ai"
+                      ? "Respuesta de IA · no es un profesional"
+                      : "Respuesta simulada · sin IA"}
                   {speech.supported && (
                     <Button
                       type="button"
@@ -136,6 +178,11 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
               </MessageContent>
             </Message>
           ))}
+          {pending && (
+            <p role="status" className="text-sm text-muted-foreground">
+              Pensando una respuesta…
+            </p>
+          )}
         </ConversationContent>
         <ConversationScrollButton
           aria-label="Ver los últimos mensajes"
@@ -152,6 +199,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
           aria-label="Tu mensaje"
           aria-describedby="conversation-privacy"
           value={text}
+          disabled={pending}
           onChange={(e) => setText(e.target.value)}
           placeholder="Puedes contarme lo que quieras…"
           className="min-h-20 min-w-0 w-full px-4 text-base outline-none placeholder:text-muted-foreground"
@@ -197,8 +245,8 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
             </Button>
           )}
           <PromptInputSubmit
-            status="ready"
-            disabled={!text.trim()}
+            status={pending ? "submitted" : "ready"}
+            disabled={!text.trim() || pending}
             aria-label="Enviar"
             title="Enviar"
             className="size-11 shrink-0 rounded-2xl"
@@ -242,8 +290,9 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         id="conversation-privacy"
         className="mt-3 text-center text-xs leading-relaxed text-secondary-foreground"
       >
-        Demostración sin IA · frases simuladas según palabras clave; pueden no encajar. No se
-        guardan las conversaciones.
+        {demoMode
+          ? "Demostración sin IA · frases simuladas según palabras clave; pueden no encajar. No se guardan las conversaciones."
+          : "Las respuestas las genera una inteligencia artificial y no sustituyen a un profesional. Tus mensajes se envían a un servicio de IA (Google Gemini) solo para responder; no se guardan las conversaciones. Si el servicio no está disponible, verás respuestas simuladas sin IA."}
       </p>
     </main>
   );

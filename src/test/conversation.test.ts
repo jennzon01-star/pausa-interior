@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { appendDemoTurn, respondWithDemo, type ConversationMessage } from "@/lib/conversation";
+import {
+  appendAssistantMessage,
+  appendDemoTurn,
+  appendUserMessage,
+  respondWithDemo,
+  type ConversationMessage,
+} from "@/lib/conversation";
 
 const reply = (content: string) =>
   respondWithDemo({ topic: "conversar", messages: [{ id: "user", role: "user", content }] });
@@ -50,5 +56,24 @@ describe("Offline conversation", () => {
     expect(initial).toHaveLength(1);
     expect(next.map((message) => message.role)).toEqual(["assistant", "user", "assistant"]);
     expect(appendDemoTurn(initial, "  ", "conversar", responder)).toEqual(initial);
+  });
+});
+
+describe("Turn helpers", () => {
+  it("appends a trimmed user message and ignores blank input", () => {
+    const initial: ConversationMessage[] = [];
+    const next = appendUserMessage(initial, "  Hola  ");
+    expect(next).toEqual([{ id: "message-0", role: "user", content: "Hola" }]);
+    expect(initial).toHaveLength(0);
+    expect(appendUserMessage(next, "   ")).toEqual(next);
+  });
+  it("appends an assistant reply tagged with its source", () => {
+    const history = appendUserMessage([], "Hola");
+    expect(appendAssistantMessage(history, "Buenas", "ai").at(-1)).toEqual({
+      id: "message-1",
+      role: "assistant",
+      content: "Buenas",
+      source: "ai",
+    });
   });
 });
