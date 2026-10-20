@@ -90,4 +90,39 @@ describe("TopicPage with the AI server function", () => {
     expect(screen.queryByText("Un gusto hablar contigo.")).not.toBeInTheDocument();
     expect(newChatBtn).toBeDisabled();
   });
+
+  it("hides input during mindfulness in calma and asks follow-up when finished", async () => {
+    vi.stubGlobal("speechSynthesis", {
+      getVoices: () => [],
+      speak: () => {},
+      cancel: () => {},
+    });
+    vi.stubGlobal(
+      "SpeechSynthesisUtterance",
+      class {
+        text = "";
+      },
+    );
+
+    render(<TopicPage slug="calma" />);
+
+    expect(screen.getByText(/Tómate este momento para ti/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Tu mensaje")).toBeInTheDocument();
+
+    const startBtn = screen.getByRole("button", { name: /Iniciar guía de respiración/ });
+    fireEvent.click(startBtn);
+
+    expect(screen.queryByLabelText("Tu mensaje")).not.toBeInTheDocument();
+    expect(screen.queryByText(/No se guardan las conversaciones/)).not.toBeInTheDocument();
+
+    const stopBtn = screen.getByRole("button", {
+      name: "Terminar ejercicio de respiración guiada",
+    });
+    fireEvent.click(stopBtn);
+
+    expect(screen.getByLabelText("Tu mensaje")).toBeInTheDocument();
+    expect(
+      await screen.findByText("¿Cómo te sientes ahora? ¿Quieres continuar la conversación?"),
+    ).toBeInTheDocument();
+  });
 });

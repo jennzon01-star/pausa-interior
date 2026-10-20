@@ -26,7 +26,8 @@ export const topics: Topic[] = [
     slug: "emociones",
     title: "Comprender mis emociones",
     icon: "🌿",
-    intro: "Las emociones no son buenas ni malas: son señales. Podemos mirarlas juntos, sin juzgarlas.",
+    intro:
+      "Las emociones no son buenas ni malas: son señales. Podemos mirarlas juntos, sin juzgarlas.",
     replies: [
       "Lo que sientes tiene sentido dentro de lo que estás viviendo.",
       "A veces ponerle nombre a una emoción ya la hace un poco más liviana.",
@@ -37,7 +38,8 @@ export const topics: Topic[] = [
     slug: "calma",
     title: "Encontrar un momento de calma",
     icon: "🍃",
-    intro: "Respira conmigo. Sigue el círculo: inhala mientras crece, exhala mientras se encoge.",
+    intro:
+      "Tómate este momento para ti. Inhala lentamente… y exhala con suavidad. No tienes que hacer nada más. Simplemente, date permiso para estar aquí.",
     replies: [
       "Bien. Quédate un momento con esa respiración.",
       "Nota tus pies en el suelo y tus hombros soltándose un poco.",
@@ -47,7 +49,8 @@ export const topics: Topic[] = [
     slug: "dificultad",
     title: "Afrontar una dificultad",
     icon: "🪨",
-    intro: "Las dificultades se recorren mejor paso a paso. Cuéntame lo que está pasando, si quieres.",
+    intro:
+      "Las dificultades se recorren mejor paso a paso. Cuéntame lo que está pasando, si quieres.",
     replies: [
       "Eso suena exigente. Vamos a mirarlo por partes, sin apuro.",
       "No tienes que resolverlo todo hoy. Un primer paso pequeño ya cuenta.",

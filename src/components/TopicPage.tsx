@@ -71,6 +71,15 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     setText("");
   };
 
+  const handleStopMindfulness = () => {
+    mindfulness.stop();
+    const followUp = "¿Cómo te sientes ahora? ¿Quieres continuar la conversación?";
+    setMsgs((m) => appendAssistantMessage(m, followUp, demoMode ? "demo" : "ai"));
+    if (speech.supported) {
+      speech.speak(followUp);
+    }
+  };
+
   const ask = async (value: string, current: readonly ConversationMessage[]) => {
     const history = appendUserMessage(current, value);
     if (history.length === current.length) return;
@@ -181,7 +190,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                 type="button"
                 variant="outline"
                 size="lg"
-                onClick={mindfulness.stop}
+                onClick={handleStopMindfulness}
                 aria-label="Terminar ejercicio de respiración guiada"
                 className="h-12 gap-2 rounded-full border-primary/40 px-6 font-medium text-foreground hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
               >
@@ -272,110 +281,116 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         />
       </Conversation>
 
-      <PromptInput
-        onSubmit={({ text: value }) => send(value)}
-        maxFiles={0}
-        className="mt-6 [&_[data-slot=input-group]]:rounded-3xl [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-sm"
-      >
-        <PromptInputTextarea
-          aria-label="Tu mensaje"
-          aria-describedby="conversation-privacy"
-          value={text}
-          disabled={pending}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Puedes contarme lo que quieras…"
-          className="min-h-20 min-w-0 w-full px-4 text-base outline-none placeholder:text-muted-foreground"
-        />
-        <PromptInputFooter className="justify-end gap-2 px-3 pb-3">
-          {dictation.supported && (
-            <Button
-              type="button"
-              variant={dictation.status === "listening" ? "default" : "outline"}
-              size="icon"
-              onClick={toggleDictation}
-              aria-label={
-                dictation.status === "listening"
-                  ? "Detener dictado por voz"
-                  : "Dictar mensaje por voz"
-              }
-              aria-pressed={dictation.status === "listening"}
-              title={
-                dictation.status === "listening"
-                  ? "Detener dictado por voz"
-                  : "Dictar mensaje por voz"
-              }
-              className="size-11 shrink-0 rounded-2xl"
-            >
-              {dictation.status === "listening" ? (
-                <MicOff className="size-5" />
-              ) : (
-                <Mic className="size-5" />
-              )}
-            </Button>
-          )}
-          {speech.speaking && (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={speech.stop}
-              aria-label="Detener la reproducción hablada"
-              title="Detener la reproducción hablada"
-              className="size-11 shrink-0 rounded-2xl"
-            >
-              <Square className="size-5" />
-            </Button>
-          )}
-          <PromptInputSubmit
-            status={pending ? "submitted" : "ready"}
-            disabled={!text.trim() || pending}
-            aria-label="Enviar"
-            title="Enviar"
-            className="size-11 shrink-0 rounded-2xl"
+      {!mindfulness.isActive && (
+        <>
+          <PromptInput
+            onSubmit={({ text: value }) => send(value)}
+            maxFiles={0}
+            className="mt-6 [&_[data-slot=input-group]]:rounded-3xl [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-sm"
           >
-            <ArrowUp className="size-5" />
-          </PromptInputSubmit>
-        </PromptInputFooter>
-      </PromptInput>
-      <div aria-live="polite" className="mt-3 space-y-1">
-        {dictation.status === "listening" && (
-          <p className="text-center text-sm text-primary">
-            Escuchando… habla con calma; el texto aparecerá en el cuadro para que lo revises antes
-            de enviarlo.
-            {dictation.interim && (
-              <span className="block text-muted-foreground">{dictation.interim}</span>
+            <PromptInputTextarea
+              aria-label="Tu mensaje"
+              aria-describedby="conversation-privacy"
+              value={text}
+              disabled={pending}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Puedes contarme lo que quieras…"
+              className="min-h-20 min-w-0 w-full px-4 text-base outline-none placeholder:text-muted-foreground"
+            />
+            <PromptInputFooter className="justify-end gap-2 px-3 pb-3">
+              {dictation.supported && (
+                <Button
+                  type="button"
+                  variant={dictation.status === "listening" ? "default" : "outline"}
+                  size="icon"
+                  onClick={toggleDictation}
+                  aria-label={
+                    dictation.status === "listening"
+                      ? "Detener dictado por voz"
+                      : "Dictar mensaje por voz"
+                  }
+                  aria-pressed={dictation.status === "listening"}
+                  title={
+                    dictation.status === "listening"
+                      ? "Detener dictado por voz"
+                      : "Dictar mensaje por voz"
+                  }
+                  className="size-11 shrink-0 rounded-2xl"
+                >
+                  {dictation.status === "listening" ? (
+                    <MicOff className="size-5" />
+                  ) : (
+                    <Mic className="size-5" />
+                  )}
+                </Button>
+              )}
+              {speech.speaking && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={speech.stop}
+                  aria-label="Detener la reproducción hablada"
+                  title="Detener la reproducción hablada"
+                  className="size-11 shrink-0 rounded-2xl"
+                >
+                  <Square className="size-5" />
+                </Button>
+              )}
+              <PromptInputSubmit
+                status={pending ? "submitted" : "ready"}
+                disabled={!text.trim() || pending}
+                aria-label="Enviar"
+                title="Enviar"
+                className="size-11 shrink-0 rounded-2xl"
+              >
+                <ArrowUp className="size-5" />
+              </PromptInputSubmit>
+            </PromptInputFooter>
+          </PromptInput>
+          <div aria-live="polite" className="mt-3 space-y-1">
+            {dictation.status === "listening" && (
+              <p className="text-center text-sm text-primary">
+                Escuchando… habla con calma; el texto aparecerá en el cuadro para que lo revises
+                antes de enviarlo.
+                {dictation.interim && (
+                  <span className="block text-muted-foreground">{dictation.interim}</span>
+                )}
+              </p>
             )}
+            {dictation.status === "unsupported" && (
+              <p className="text-center text-sm text-muted-foreground">
+                Este navegador no admite dictado por voz. Puedes seguir escribiendo tu mensaje con
+                el teclado.
+              </p>
+            )}
+            {dictation.status === "denied" && (
+              <p className="text-center text-sm text-muted-foreground">
+                No se pudo usar el micrófono porque el permiso fue denegado. Puedes activarlo en la
+                configuración del navegador o seguir escribiendo con el teclado.
+              </p>
+            )}
+            {dictation.status === "error" && (
+              <p className="text-center text-sm text-muted-foreground">
+                El dictado por voz se interrumpió. Puedes intentarlo de nuevo o escribir tu mensaje.
+              </p>
+            )}
+            {speech.speaking && (
+              <p className="text-center text-sm text-primary">
+                Reproduciendo respuesta en voz alta…
+              </p>
+            )}
+          </div>
+          <p
+            id="conversation-privacy"
+            className="mt-3 text-center text-xs leading-relaxed text-secondary-foreground"
+          >
+            {demoMode
+              ? "Demostración sin IA · frases simuladas según palabras clave; pueden no encajar. No se guardan las conversaciones."
+              : "Las respuestas las genera una inteligencia artificial y no sustituyen a un profesional. Tus mensajes se envían a un servicio de IA (Google Gemini) solo para responder; no se guardan las conversaciones. Si el servicio no está disponible, verás respuestas simuladas sin IA."}
           </p>
-        )}
-        {dictation.status === "unsupported" && (
-          <p className="text-center text-sm text-muted-foreground">
-            Este navegador no admite dictado por voz. Puedes seguir escribiendo tu mensaje con el
-            teclado.
-          </p>
-        )}
-        {dictation.status === "denied" && (
-          <p className="text-center text-sm text-muted-foreground">
-            No se pudo usar el micrófono porque el permiso fue denegado. Puedes activarlo en la
-            configuración del navegador o seguir escribiendo con el teclado.
-          </p>
-        )}
-        {dictation.status === "error" && (
-          <p className="text-center text-sm text-muted-foreground">
-            El dictado por voz se interrumpió. Puedes intentarlo de nuevo o escribir tu mensaje.
-          </p>
-        )}
-        {speech.speaking && (
-          <p className="text-center text-sm text-primary">Reproduciendo respuesta en voz alta…</p>
-        )}
-      </div>
-      <p
-        id="conversation-privacy"
-        className="mt-3 text-center text-xs leading-relaxed text-secondary-foreground"
-      >
-        {demoMode
-          ? "Demostración sin IA · frases simuladas según palabras clave; pueden no encajar. No se guardan las conversaciones."
-          : "Las respuestas las genera una inteligencia artificial y no sustituyen a un profesional. Tus mensajes se envían a un servicio de IA (Google Gemini) solo para responder; no se guardan las conversaciones. Si el servicio no está disponible, verás respuestas simuladas sin IA."}
-      </p>
+        </>
+      )}
     </main>
   );
 }
