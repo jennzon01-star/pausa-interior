@@ -1,19 +1,24 @@
 import type { TopicSlug } from "@/lib/topics";
 import { conversationPrinciples } from "@/lib/conversation-principles";
 
+export type ConversationSource = "demo" | "ai";
+
 export type ConversationMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
-  source?: "demo";
+  source?: ConversationSource;
 };
 
-// The presentation supplies the entire history. A future adapter can replace
-// this local responder without changing the transcript or persisting messages.
+// The presentation supplies the entire history. The AI reply is produced by a
+// server function; this local responder is the offline fallback. Messages are
+// never persisted.
 export type ConversationResponder = (request: {
   topic: TopicSlug;
   messages: readonly ConversationMessage[];
 }) => string;
+
+export type ConversationReply = { reply: string; source: ConversationSource };
 
 export const conversationGuidelines = conversationPrinciples.map((p) => p.rule);
 
@@ -119,21 +124,30 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
   ]);
 };
 
+export function appendUserMessage(
+  messages: readonly ConversationMessage[],
+  content: string,
+): ConversationMessage[] {
+  const trimmed = content.trim();
+  if (!trimmed) return [...messages];
+  return [...messages, { id: `message-${messages.length}`, role: "user", content: trimmed }];
+}
+
+export function appendAssistantMessage(
+  messages: readonly ConversationMessage[],
+  content: string,
+  source: ConversationSource,
+): ConversationMessage[] {
+  return [...messages, { id: `message-${messages.length}`, role: "assistant", content, source }];
+}
+
 export function appendDemoTurn(
   messages: readonly ConversationMessage[],
   content: string,
   topic: TopicSlug,
   responder: ConversationResponder = respondWithDemo,
 ): ConversationMessage[] {
-  const trimmed = content.trim();
-  if (!trimmed) return [...messages];
-  const history: ConversationMessage[] = [
-    ...messages,
-    { id: `message-${messages.length}`, role: "user", content: trimmed },
-  ];
-  const reply = responder({ topic, messages: history });
-  return [
-    ...history,
-    { id: `message-${history.length}`, role: "assistant", content: reply, source: "demo" },
-  ];
+  if (!content.trim()) return [...messages];
+  const history = appendUserMessage(messages, content);
+  return appendAssistantMessage(history, responder({ topic, messages: history }), "demo");
 }
