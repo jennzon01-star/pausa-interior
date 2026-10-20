@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topics";
 import { TopicIcon } from "@/components/TopicIcon";
-import { ArrowUp, Mic, MicOff, Square, Volume2 } from "lucide-react";
+import { ArrowUp, Mic, MicOff, RotateCcw, Square, Volume2 } from "lucide-react";
 import { useDictation, useSpeechSynthesis } from "@/hooks/use-speech";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,6 +61,13 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     onFinalTranscript: (t) => setText((prev) => (prev ? `${prev} ${t}` : t)),
   });
 
+  const resetConversation = () => {
+    if (dictation.status === "listening") dictation.stop();
+    if (speech.speaking) speech.stop();
+    setMsgs([{ id: "intro", role: "assistant", content: topic.intro, source: "demo" }]);
+    setText("");
+  };
+
   const ask = async (value: string, current: readonly ConversationMessage[]) => {
     const history = appendUserMessage(current, value);
     if (history.length === current.length) return;
@@ -86,8 +93,8 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
 
   useEffect(() => {
     const p = takePendingMessage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per slug (component is keyed by slug)
     if (p) void ask(p, msgs);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per slug (component is keyed by slug)
   }, [slug]);
 
   return (
@@ -99,9 +106,25 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         >
           Pausa Interior
         </Link>
-        <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground">
-          {demoMode ? "Modo demostración" : "Asistente de IA"}
-        </span>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={resetConversation}
+            disabled={pending || (msgs.length <= 1 && !text.trim())}
+            aria-label="Nueva conversación"
+            title="Iniciar nueva conversación"
+            className="h-8 gap-1.5 rounded-full px-3 text-xs"
+          >
+            <RotateCcw className="size-3.5" />
+            <span className="hidden sm:inline">Nueva conversación</span>
+            <span className="sm:hidden">Reiniciar</span>
+          </Button>
+          <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground">
+            {demoMode ? "Modo demostración" : "Asistente de IA"}
+          </span>
+        </div>
       </header>
 
       <nav aria-label="Opciones de acompañamiento" className="mt-6 flex flex-wrap gap-2">

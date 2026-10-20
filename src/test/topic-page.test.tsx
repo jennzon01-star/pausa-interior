@@ -72,4 +72,22 @@ describe("TopicPage with the AI server function", () => {
     expect(screen.getByText(/Respuesta simulada · sin IA/)).toBeInTheDocument();
     expect(screen.getByLabelText("Tu mensaje")).not.toBeDisabled();
   });
+
+  it("resets conversation when the new conversation button is clicked", async () => {
+    sendChatTurn.mockResolvedValue({ reply: "Un gusto hablar contigo.", source: "ai" });
+    render(<TopicPage slug="conversar" />);
+
+    const newChatBtn = screen.getByRole("button", { name: "Nueva conversación" });
+    expect(newChatBtn).toBeDisabled();
+
+    submit("Hola, quiero hablar");
+    expect(await screen.findByText("Un gusto hablar contigo.")).toBeInTheDocument();
+    expect(screen.getByText("Hola, quiero hablar")).toBeInTheDocument();
+    expect(newChatBtn).not.toBeDisabled();
+
+    fireEvent.click(newChatBtn);
+    expect(screen.queryByText("Hola, quiero hablar")).not.toBeInTheDocument();
+    expect(screen.queryByText("Un gusto hablar contigo.")).not.toBeInTheDocument();
+    expect(newChatBtn).toBeDisabled();
+  });
 });
