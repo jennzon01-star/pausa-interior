@@ -54,9 +54,9 @@ export const topics: Topic[] = [
     replies: [
       "Eso suena exigente. Vamos a mirarlo por partes, sin apuro.",
       "No tienes que resolverlo todo hoy. Un primer paso pequeño ya cuenta.",
-      "Has atravesado otros momentos difíciles; esa experiencia también está contigo.",
+      "Si lo deseas, podemos mirar con qué cuentas hoy: lo que sabes, lo que has aprendido o quién te puede apoyar.",
       "Podemos desglosar lo que pasa: separar lo que está en tus manos de lo que no ayuda a aligerar la carga.",
-      "Tus experiencias previas y tus personas de confianza son recursos valiosos que siguen a tu lado.",
+      "Reconocer tus recursos puede ser pensar en qué te ha servido antes, si es que lo recuerdas, o en quién podría apoyarte.",
       "Mirar alternativas posibles paso a paso abre opciones viables sin forzarte a nada.",
     ],
   },

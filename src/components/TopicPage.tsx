@@ -296,7 +296,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                   Reconocer mis recursos
                 </span>
                 <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
-                  Recordar tus fortalezas, experiencias previas y apoyos a tu favor.
+                  Identificar tus fortalezas, aprendizajes o apoyos, si quieres.
                 </span>
               </div>
             </Button>

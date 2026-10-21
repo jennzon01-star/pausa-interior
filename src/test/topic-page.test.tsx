@@ -149,7 +149,7 @@ describe("TopicPage with the AI server function", () => {
 
   it("combines existing input with difficulty action when clicked", async () => {
     sendChatTurn.mockResolvedValue({
-      reply: "Tus recursos y fortalezas previas siguen estando contigo.",
+      reply: "Si quieres, podemos pensar qué fortalezas reconoces en ti.",
       source: "ai",
     });
     render(<TopicPage slug="dificultad" />);
@@ -164,7 +164,7 @@ describe("TopicPage with the AI server function", () => {
       await screen.findByText(/Siento mucha presión en el trabajo[\s\S]*Me gustaría reconocer mis recursos/),
     ).toBeInTheDocument();
     expect(
-      await screen.findByText("Tus recursos y fortalezas previas siguen estando contigo."),
+      await screen.findByText("Si quieres, podemos pensar qué fortalezas reconoces en ti."),
     ).toBeInTheDocument();
   });
 });

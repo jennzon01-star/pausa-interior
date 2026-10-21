@@ -86,8 +86,8 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
     ]);
   if (recognizeResources)
     return choose([
-      "Tus recursos no son solo cosas materiales: tus aprendizajes previos, la gente en quien confías y tu temple cuentan mucho.",
-      "Has atravesado otros momentos complejos en el pasado. Esas mismas fortalezas siguen estando contigo hoy.",
+      "Los recursos pueden ser muchas cosas: habilidades, conocimientos, personas o hábitos que te ayuden. Podemos pensar cuáles tienes a mano.",
+      "Si quieres, podemos explorar qué fortalezas o apoyos reconoces en ti o a tu alrededor, a tu ritmo.",
       "Reconocer con qué cuentas —por sencillo que parezca— te da un punto de apoyo firme para continuar.",
     ]);
   if (considerAlternatives)
