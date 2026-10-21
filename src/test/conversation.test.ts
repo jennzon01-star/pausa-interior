@@ -43,6 +43,13 @@ describe("Offline conversation", () => {
     expect(reply("Solo quiero conversar")).toContain("onvers");
     expect(reply("Hoy estuve trabajando en mi jardín y me sentí muy bien")).toContain("jardín");
   });
+  it("helps identify feelings without labeling, prescribing or diagnosing", () => {
+    for (const msg of ["No sé qué siento", "Quiero entender lo que siento"]) {
+      const r = reply(msg);
+      expect(r).toMatch(/nombre|palabras|palabra/);
+      expect(r).not.toMatch(/depresi|ansiedad|trastorno|deberías sentir|estás triste|tienes /i);
+    }
+  });
   it("supports sorting thoughts, recognizing resources and considering alternatives", () => {
     expect(reply("Quiero ayuda para ordenar mis pensamientos")).toMatch(/orden|partes|hechos/);
     expect(reply("Me gustaría reconocer mis recursos y fortalezas")).toMatch(/recursos|fortalezas|aprendizajes/);

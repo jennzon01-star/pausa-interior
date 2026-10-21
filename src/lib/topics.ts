@@ -27,11 +27,11 @@ export const topics: Topic[] = [
     title: "Comprender mis emociones",
     icon: "🌿",
     intro:
-      "Las emociones no son buenas ni malas: son señales. Podemos mirarlas juntos, sin juzgarlas.",
+      "Si lo deseas, podemos explorar con curiosidad lo que estás sintiendo, a tu ritmo y sin juzgarlo. Tú decides las palabras: no hay etiquetas correctas ni nada que debas sentir.",
     replies: [
-      "Lo que sientes tiene sentido dentro de lo que estás viviendo.",
-      "A veces ponerle nombre a una emoción ya la hace un poco más liviana.",
-      "Es posible sentir varias cosas a la vez. Eso también es humano.",
+      "Gracias por compartirlo. Si quieres, puedes contarme cómo lo notas, con tus propias palabras.",
+      "No hace falta ponerle un nombre exacto. A veces basta con describir qué se siente en el cuerpo o qué pasa por la cabeza.",
+      "Puede haber varias sensaciones a la vez, o ninguna clara todavía. Cualquiera de esas formas está bien.",
     ],
   },
   {

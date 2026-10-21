@@ -56,6 +56,12 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
       text,
     ) && !/\bno (?:quiero|necesito|busco|pido) (?:\w+ )?ayuda\b/.test(text);
 
+  const identifyFeelings =
+    /\bno se (?:que|lo que) (?:siento|estoy sintiendo|sentir)\b/.test(text) ||
+    /\b(?:entender|identificar|comprender|reconocer|poner nombre a)\b.*\b(?:emocion\w*|siento|sentimiento\w*|sentir)\b/.test(
+      text,
+    );
+
   const sortThoughts =
     /\b(ordenar|aclarar|organizar|despejar)\b.*\b(pensamiento\w*|mente|cabeza|idea\w*)/.test(text) ||
     /\b(pensamiento\w*|mente|cabeza|idea\w*)\b.*\b(ordenar|aclarar|organizar|despejar)/.test(text);
@@ -68,6 +74,12 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
   const considerAlternatives =
     /\b(alternativa\w*|opcion\w*|posibilidad\w*|caminos?\b|otros caminos|otras vias)/.test(text);
 
+  if (identifyFeelings)
+    return choose([
+      "Puede que todavía no tenga nombre, y está bien. Si quieres, cuéntame cómo lo notas: en el cuerpo, en la cabeza o en lo que te rodea.",
+      "Podemos ir despacio y con tus propias palabras. No hay una respuesta correcta ni algo que debas sentir.",
+      "Si alguna palabra te resuena, puedes probarla; y si no encaja, la dejamos. Tú eres quien mejor lo reconoce.",
+    ]);
   if (/\bno se (?:que|lo que) me pasa\b/.test(text))
     return choose([
       "Está bien no tenerlo claro. Puedes ir con calma y sin prisa, aquí te leo.",
