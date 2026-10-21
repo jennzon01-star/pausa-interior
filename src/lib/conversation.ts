@@ -56,6 +56,18 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
       text,
     ) && !/\bno (?:quiero|necesito|busco|pido) (?:\w+ )?ayuda\b/.test(text);
 
+  const sortThoughts =
+    /\b(ordenar|aclarar|organizar|despejar)\b.*\b(pensamiento\w*|mente|cabeza|idea\w*)/.test(text) ||
+    /\b(pensamiento\w*|mente|cabeza|idea\w*)\b.*\b(ordenar|aclarar|organizar|despejar)/.test(text);
+
+  const recognizeResources =
+    /\b(recurso\w*|fortaleza\w*|habilidad\w*|con que cuento|apoyo\w*|herramienta\w*|experiencia previa)/.test(
+      text,
+    );
+
+  const considerAlternatives =
+    /\b(alternativa\w*|opcion\w*|posibilidad\w*|caminos?\b|otros caminos|otras vias)/.test(text);
+
   if (/\bno se (?:que|lo que) me pasa\b/.test(text))
     return choose([
       "Está bien no tenerlo claro. Puedes ir con calma y sin prisa, aquí te leo.",
@@ -65,6 +77,24 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
     return choose([
       "Claro, conversemos tranquilamente de lo que te apetezca hoy.",
       "Me parece un gran plan. Aquí hay espacio para charlar sin apuros.",
+    ]);
+  if (sortThoughts)
+    return choose([
+      "Vamos a ordenarlo por partes. A veces ayuda escribir los hechos y separar lo que depende de ti de lo que escapa de tu control.",
+      "Para poner orden en los pensamientos, ayuda ir de a una cosa a la vez. Sin prisa ni exigencias.",
+      "Separar el torbellino de la cabeza en puntos concretos suele quitarle bastante peso a la situación.",
+    ]);
+  if (recognizeResources)
+    return choose([
+      "Tus recursos no son solo cosas materiales: tus aprendizajes previos, la gente en quien confías y tu temple cuentan mucho.",
+      "Has atravesado otros momentos complejos en el pasado. Esas mismas fortalezas siguen estando contigo hoy.",
+      "Reconocer con qué cuentas —por sencillo que parezca— te da un punto de apoyo firme para continuar.",
+    ]);
+  if (considerAlternatives)
+    return choose([
+      "Para considerar alternativas no hace falta una solución perfecta; basta con identificar un primer paso viable y realista.",
+      "Podemos explorar dos o tres caminos distintos y ver cuál te genera más serenidad y menos desgaste.",
+      "Siempre hay más de una manera de abordar una misma situación. Mirarlas con calma ayuda a elegir sin presión.",
     ]);
   if (help)
     return choose([

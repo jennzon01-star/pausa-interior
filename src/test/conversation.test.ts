@@ -43,6 +43,11 @@ describe("Offline conversation", () => {
     expect(reply("Solo quiero conversar")).toContain("onvers");
     expect(reply("Hoy estuve trabajando en mi jardín y me sentí muy bien")).toContain("jardín");
   });
+  it("supports sorting thoughts, recognizing resources and considering alternatives", () => {
+    expect(reply("Quiero ayuda para ordenar mis pensamientos")).toMatch(/orden|partes|hechos/);
+    expect(reply("Me gustaría reconocer mis recursos y fortalezas")).toMatch(/recursos|fortalezas|aprendizajes/);
+    expect(reply("Quiero considerar alternativas y opciones")).toMatch(/alternativas|caminos|viable/);
+  });
   it("is honest when no prepared response fits", () => {
     expect(reply("Estoy organizando una colección de sellos")).toContain("respuestas limitadas");
   });

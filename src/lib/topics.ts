@@ -50,11 +50,14 @@ export const topics: Topic[] = [
     title: "Afrontar una dificultad",
     icon: "🪨",
     intro:
-      "Las dificultades se recorren mejor paso a paso. Cuéntame lo que está pasando, si quieres.",
+      "Las dificultades se recorren mejor paso a paso. Cuando lo desees, podemos ordenar tus pensamientos, reconocer tus recursos y considerar alternativas. Cuéntame lo que está pasando o elige cómo empezar.",
     replies: [
       "Eso suena exigente. Vamos a mirarlo por partes, sin apuro.",
       "No tienes que resolverlo todo hoy. Un primer paso pequeño ya cuenta.",
       "Has atravesado otros momentos difíciles; esa experiencia también está contigo.",
+      "Podemos desglosar lo que pasa: separar lo que está en tus manos de lo que no ayuda a aligerar la carga.",
+      "Tus experiencias previas y tus personas de confianza son recursos valiosos que siguen a tu lado.",
+      "Mirar alternativas posibles paso a paso abre opciones viables sin forzarte a nada.",
     ],
   },
   {

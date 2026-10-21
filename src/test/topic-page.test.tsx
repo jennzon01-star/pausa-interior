@@ -125,4 +125,47 @@ describe("TopicPage with the AI server function", () => {
       await screen.findByText("¿Cómo te sientes ahora? ¿Quieres continuar la conversación?"),
     ).toBeInTheDocument();
   });
+
+  it("shows difficulty assistance options and triggers prompt when clicked", async () => {
+    sendChatTurn.mockResolvedValue({
+      reply: "Vamos a ordenarlo por partes con calma.",
+      source: "ai",
+    });
+    render(<TopicPage slug="dificultad" />);
+
+    expect(screen.getByText("Acompañamiento paso a paso")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ordenar mis pensamientos" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reconocer mis recursos" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Considerar alternativas" })).toBeInTheDocument();
+
+    const thoughtsBtn = screen.getByRole("button", { name: "Ordenar mis pensamientos" });
+    fireEvent.click(thoughtsBtn);
+
+    expect(
+      await screen.findByText("Quiero ayuda para ordenar mis pensamientos sobre lo que está pasando."),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("Vamos a ordenarlo por partes con calma.")).toBeInTheDocument();
+  });
+
+  it("combines existing input with difficulty action when clicked", async () => {
+    sendChatTurn.mockResolvedValue({
+      reply: "Tus recursos y fortalezas previas siguen estando contigo.",
+      source: "ai",
+    });
+    render(<TopicPage slug="dificultad" />);
+
+    fireEvent.change(screen.getByLabelText("Tu mensaje"), {
+      target: { value: "Siento mucha presión en el trabajo" },
+    });
+    const resourcesBtn = screen.getByRole("button", { name: "Reconocer mis recursos" });
+    fireEvent.click(resourcesBtn);
+
+    expect(
+      await screen.findByText(/Siento mucha presión en el trabajo[\s\S]*Me gustaría reconocer mis recursos/),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("Tus recursos y fortalezas previas siguen estando contigo."),
+    ).toBeInTheDocument();
+  });
 });
+

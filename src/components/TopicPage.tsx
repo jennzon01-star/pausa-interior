@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topics";
 import { TopicIcon } from "@/components/TopicIcon";
-import { ArrowUp, Mic, MicOff, RotateCcw, Square, Volume2 } from "lucide-react";
+import { ArrowUp, Brain, Compass, Mic, MicOff, RotateCcw, ShieldCheck, Square, Volume2 } from "lucide-react";
 import { useDictation, useSpeechSynthesis } from "@/hooks/use-speech";
 import { useMindfulnessBreathingVoice } from "@/hooks/use-mindfulness";
 import { Button } from "@/components/ui/button";
@@ -101,6 +101,28 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
   const toggleDictation = () => {
     if (dictation.status === "listening") dictation.stop();
     else dictation.start();
+  };
+
+  const handleDifficultyAction = (action: "thoughts" | "resources" | "alternatives") => {
+    if (pending) return;
+    if (dictation.status === "listening") dictation.stop();
+    const currentInput = text.trim();
+    setText("");
+    let promptText = "";
+    if (action === "thoughts") {
+      promptText = currentInput
+        ? `${currentInput}\n\nQuisiera ayuda para ordenar mis pensamientos sobre esto.`
+        : "Quiero ayuda para ordenar mis pensamientos sobre lo que está pasando.";
+    } else if (action === "resources") {
+      promptText = currentInput
+        ? `${currentInput}\n\nMe gustaría reconocer mis recursos y fortalezas para afrontar esto.`
+        : "Me gustaría reconocer mis recursos y fortalezas para afrontar esta situación.";
+    } else {
+      promptText = currentInput
+        ? `${currentInput}\n\nQuiero considerar alternativas y opciones para afrontar esto.`
+        : "Quiero considerar alternativas y opciones para afrontar esta situación.";
+    }
+    void ask(promptText, msgs);
   };
 
   useEffect(() => {
@@ -215,6 +237,90 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                 Ciclo {mindfulness.cycleCount + 1} · Decide con libertad cuándo terminar
               </span>
             )}
+          </div>
+        </section>
+      )}
+
+      {slug === "dificultad" && (
+        <section
+          aria-label="Acompañamiento para afrontar una dificultad"
+          className="my-6 rounded-3xl border bg-card/60 p-5 shadow-sm backdrop-blur-xs"
+        >
+          <div className="flex flex-col gap-1 text-center sm:text-left">
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Acompañamiento paso a paso
+            </span>
+            <h2 className="text-lg font-medium text-foreground">
+              ¿Por dónde te gustaría empezar?
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Cuando lo desees, puedes elegir una de estas opciones para avanzar juntos o escribir directamente abajo.
+            </p>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleDifficultyAction("thoughts")}
+              disabled={pending}
+              aria-label="Ordenar mis pensamientos"
+              className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
+                <Brain className="size-4" />
+              </div>
+              <div className="w-full">
+                <span className="block text-sm font-medium text-foreground">
+                  Ordenar pensamientos
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
+                  Desglosar la situación y separar lo que puedes controlar de lo que no.
+                </span>
+              </div>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleDifficultyAction("resources")}
+              disabled={pending}
+              aria-label="Reconocer mis recursos"
+              className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
+                <ShieldCheck className="size-4" />
+              </div>
+              <div className="w-full">
+                <span className="block text-sm font-medium text-foreground">
+                  Reconocer mis recursos
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
+                  Recordar tus fortalezas, experiencias previas y apoyos a tu favor.
+                </span>
+              </div>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleDifficultyAction("alternatives")}
+              disabled={pending}
+              aria-label="Considerar alternativas"
+              className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
+                <Compass className="size-4" />
+              </div>
+              <div className="w-full">
+                <span className="block text-sm font-medium text-foreground">
+                  Considerar alternativas
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
+                  Explorar opciones viables y definir un primer paso pequeño y realista.
+                </span>
+              </div>
+            </Button>
           </div>
         </section>
       )}
