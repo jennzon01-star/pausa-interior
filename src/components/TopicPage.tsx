@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topics";
 import { TopicIcon } from "@/components/TopicIcon";
 import { ArrowUp, Brain, Compass, Mic, MicOff, RotateCcw, ShieldCheck, Square, Volume2 } from "lucide-react";
@@ -55,6 +55,15 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
   ]);
   const [text, setText] = useState("");
   const [pending, setPending] = useState(false);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      // Al cambiar de opción nada de esta conversación debe seguir vivo.
+      alive.current = false;
+      if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+    };
+  }, []);
   const lastReplySource = msgs.length > 1 ? msgs.at(-1)?.source : undefined;
   const demoMode = lastReplySource === "demo";
   const speech = useSpeechSynthesis();
@@ -86,6 +95,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     setMsgs(history);
     setPending(true);
     const { reply, source } = await requestReply(slug, history);
+    if (!alive.current) return;
     setMsgs((m) => appendAssistantMessage(m, reply, source));
     setPending(false);
   };
