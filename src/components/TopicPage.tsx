@@ -60,14 +60,26 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
   const inputContainerRef = useRef<HTMLDivElement>(null);
   const scrollToInput = (focus = false) => {
     setTimeout(() => {
-      if (typeof inputContainerRef.current?.scrollIntoView === "function") {
-        inputContainerRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      if (inputContainerRef.current) {
+        if (typeof inputContainerRef.current.scrollIntoView === "function") {
+          inputContainerRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+            inline: "nearest",
+          });
+        } else if (typeof window !== "undefined") {
+          const rect = inputContainerRef.current.getBoundingClientRect();
+          window.scrollTo({
+            top: window.scrollY + rect.top - 80,
+            behavior: "smooth",
+          });
+        }
       }
       if (focus) {
         const textarea = inputContainerRef.current?.querySelector("textarea");
-        textarea?.focus();
+        textarea?.focus({ preventScroll: true });
       }
-    }, 100);
+    }, 120);
   };
 
   useEffect(() => {
@@ -239,21 +251,24 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         </div>
       </header>
 
-      <nav aria-label="Opciones de acompañamiento" className="mt-6 flex flex-wrap gap-2">
+      <nav
+        aria-label="Opciones de acompañamiento"
+        className="mt-4 sm:mt-6 flex gap-2 overflow-x-auto pb-1.5 sm:flex-wrap sm:pb-0 scrollbar-none -mx-1 px-1"
+      >
         {topics.map((t) => (
           <Link
             key={t.slug}
             to={`/${t.slug}` as const}
-            className="inline-flex min-w-0 items-center gap-2 rounded-full border bg-card px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            activeProps={{ className: "!bg-primary !text-primary-foreground border-primary" }}
+            className="inline-flex shrink-0 min-w-0 items-center gap-2 rounded-full border bg-card px-3.5 py-2 text-xs sm:text-sm text-muted-foreground transition-all hover:bg-accent active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            activeProps={{ className: "!bg-primary !text-primary-foreground border-primary shadow-xs" }}
           >
             <TopicIcon slug={t.slug} className="size-4 shrink-0" />{" "}
-            <span className="min-w-0">{t.title}</span>
+            <span className="min-w-0 font-medium">{t.title}</span>
           </Link>
         ))}
       </nav>
 
-      <h1 className="mt-8 text-3xl text-foreground">{topic.title}</h1>
+      <h1 className="mt-5 text-2xl font-serif text-foreground sm:mt-8 sm:text-3xl">{topic.title}</h1>
 
       {slug === "calma" && (
         <section
@@ -591,11 +606,11 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         aria-live="polite"
         initial="instant"
         resize="instant"
-        className="mt-6 h-[min(52dvh,32rem)] min-h-64 flex-none"
+        className="mt-4 sm:mt-6 h-[min(48dvh,32rem)] min-h-56 sm:min-h-64 flex-none"
       >
-        <ConversationContent className="gap-6 px-0 py-3">
+        <ConversationContent className="gap-4 sm:gap-6 px-0 py-2 sm:py-3">
           {msgs.map((m, i) => (
-            <Message key={m.id} from={m.role} className="max-w-[92%] sm:max-w-[85%]">
+            <Message key={m.id} from={m.role} className="max-w-[95%] sm:max-w-[85%]">
               {m.role === "assistant" && (
                 <span className="flex items-center gap-2 text-xs font-semibold text-primary">
                   <TopicIcon slug={slug} className="size-4 shrink-0" />
@@ -622,8 +637,8 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
               <MessageContent
                 className={
                   m.role === "user"
-                    ? "whitespace-pre-wrap [overflow-wrap:anywhere] text-base leading-relaxed group-[.is-user]:rounded-2xl group-[.is-user]:rounded-br-md group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground"
-                    : "text-base leading-relaxed [overflow-wrap:anywhere]"
+                    ? "whitespace-pre-wrap [overflow-wrap:anywhere] text-sm sm:text-base leading-relaxed group-[.is-user]:rounded-2xl group-[.is-user]:rounded-br-md group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground"
+                    : "text-sm sm:text-base leading-relaxed [overflow-wrap:anywhere]"
                 }
               >
                 {m.role === "assistant" ? (
@@ -649,11 +664,11 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
       </Conversation>
 
       {!mindfulness.isActive && !bodyRelaxation.isActive && (
-        <div ref={inputContainerRef} className="mt-4 sm:mt-6 scroll-mt-6">
+        <div ref={inputContainerRef} className="mt-3 sm:mt-6 scroll-mt-20 sm:scroll-mt-6">
           <PromptInput
             onSubmit={({ text: value }) => send(value)}
             maxFiles={0}
-            className="[&_[data-slot=input-group]]:rounded-3xl [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-sm"
+            className="[&_[data-slot=input-group]]:rounded-3xl [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-xs sm:[&_[data-slot=input-group]]:shadow-sm"
           >
             <PromptInputTextarea
               aria-label="Tu mensaje"
@@ -662,7 +677,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
               disabled={pending}
               onChange={(e) => setText(e.target.value)}
               placeholder="Puedes contarme lo que quieras…"
-              className="min-h-20 min-w-0 w-full px-4 text-base outline-none placeholder:text-muted-foreground"
+              className="min-h-16 sm:min-h-20 min-w-0 w-full px-3.5 sm:px-4 py-2.5 text-base outline-none placeholder:text-muted-foreground leading-relaxed"
             />
             <PromptInputFooter className="justify-end gap-2 px-3 pb-3">
               {dictation.supported && (

@@ -63,6 +63,10 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -70,6 +74,8 @@
     background-image: radial-gradient(circle at 15% 0%, var(--color-accent) 0, transparent 40%),
       radial-gradient(circle at 100% 100%, var(--color-cream) 0, transparent 45%);
     background-attachment: fixed;
+    min-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   h1, h2, h3 { font-family: var(--font-serif); }
 }
