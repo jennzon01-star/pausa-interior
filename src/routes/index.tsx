@@ -62,12 +62,37 @@ function Index() {
         ))}
       </section>
 
+      {/* Chips con sugerencias de inicio rápido */}
+      <div className="mx-auto mt-6 max-w-2xl">
+        <p className="text-center sm:text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          ¿No sabes cómo empezar? Puedes probar con:
+        </p>
+        <div className="mt-2.5 flex flex-wrap gap-2 justify-center sm:justify-start">
+          {[
+            "Hoy tuve un día muy pesado y necesito desahogarme",
+            "Siento que no llego a todo y me agobia la rutina",
+            "Quiero ordenar mis pensamientos con calma",
+            "Solo quiero conversar un rato sin juzgarme",
+            "Me siento bien hoy y quiero compartirlo",
+          ].map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              onClick={() => setText(suggestion)}
+              className="inline-flex items-center rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs sm:text-sm text-foreground/80 shadow-2xs backdrop-blur-xs transition-all hover:border-primary/50 hover:bg-accent/60 hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-left cursor-pointer"
+            >
+              «{suggestion}»
+            </button>
+          ))}
+        </div>
+      </div>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
           go();
         }}
-        className="mx-auto mt-6 max-w-2xl rounded-3xl border bg-card p-4 shadow-xs transition-shadow focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-ring sm:mt-8 sm:p-5"
+        className="mx-auto mt-4 max-w-2xl rounded-3xl border bg-card p-4 shadow-xs transition-shadow focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-ring sm:mt-5 sm:p-5"
       >
         <label htmlFor="free-message" className="sr-only">
           Tu mensaje
