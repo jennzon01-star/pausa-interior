@@ -2,9 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topics";
 import { TopicIcon } from "@/components/TopicIcon";
-import { ArrowUp, Brain, Compass, Mic, MicOff, RotateCcw, ShieldCheck, Square, Volume2 } from "lucide-react";
+import { ArrowUp, Brain, Compass, Droplets, Eye, Heart, Mic, MicOff, RotateCcw, ShieldCheck, Sparkles, Square, Volume2 } from "lucide-react";
 import { useDictation, useSpeechSynthesis } from "@/hooks/use-speech";
 import { useMindfulnessBreathingVoice } from "@/hooks/use-mindfulness";
+import { useBodyRelaxationVoice } from "@/hooks/use-body-relaxation";
 import { Button } from "@/components/ui/button";
 import {
   Conversation,
@@ -56,6 +57,19 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
   const [text, setText] = useState("");
   const [pending, setPending] = useState(false);
   const alive = useRef(true);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+  const scrollToInput = (focus = false) => {
+    setTimeout(() => {
+      if (typeof inputContainerRef.current?.scrollIntoView === "function") {
+        inputContainerRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+      if (focus) {
+        const textarea = inputContainerRef.current?.querySelector("textarea");
+        textarea?.focus();
+      }
+    }, 100);
+  };
+
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -68,16 +82,22 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
   const demoMode = lastReplySource === "demo";
   const speech = useSpeechSynthesis();
   const mindfulness = useMindfulnessBreathingVoice();
+  const bodyRelaxation = useBodyRelaxationVoice();
   const dictation = useDictation({
-    onFinalTranscript: (t) => setText((prev) => (prev ? `${prev} ${t}` : t)),
+    onFinalTranscript: (t) => {
+      setText((prev) => (prev ? `${prev} ${t}` : t));
+      scrollToInput(true);
+    },
   });
 
   const resetConversation = () => {
     if (dictation.status === "listening") dictation.stop();
     if (speech.speaking) speech.stop();
     if (mindfulness.isActive) mindfulness.stop();
+    if (bodyRelaxation.isActive) bodyRelaxation.stop();
     setMsgs([{ id: "intro", role: "assistant", content: topic.intro, source: "demo" }]);
     setText("");
+    scrollToInput(true);
   };
 
   const handleStopMindfulness = () => {
@@ -87,6 +107,17 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     if (speech.supported) {
       speech.speak(followUp);
     }
+    scrollToInput();
+  };
+
+  const handleStopBodyRelaxation = () => {
+    bodyRelaxation.stop();
+    const followUp = "¿Cómo se siente tu cuerpo tras esta pausa? Puedes contarme o seguir a tu ritmo.";
+    setMsgs((m) => appendAssistantMessage(m, followUp, demoMode ? "demo" : "ai"));
+    if (speech.supported) {
+      speech.speak(followUp);
+    }
+    scrollToInput();
   };
 
   const ask = async (value: string, current: readonly ConversationMessage[]) => {
@@ -98,6 +129,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     if (!alive.current) return;
     setMsgs((m) => appendAssistantMessage(m, reply, source));
     setPending(false);
+    scrollToInput();
   };
 
   const send = (value: string) => {
@@ -110,7 +142,10 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
 
   const toggleDictation = () => {
     if (dictation.status === "listening") dictation.stop();
-    else dictation.start();
+    else {
+      dictation.start();
+      scrollToInput(true);
+    }
   };
 
   const handleDifficultyAction = (action: "thoughts" | "resources" | "alternatives") => {
@@ -133,16 +168,49 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         : "Quiero considerar alternativas y opciones para afrontar esta situación.";
     }
     void ask(promptText, msgs);
+    scrollToInput();
+  };
+
+  const handleWellnessAction = (action: "screen" | "hydration" | "stretch" | "gratitude") => {
+    if (pending) return;
+    if (dictation.status === "listening") dictation.stop();
+    const currentInput = text.trim();
+    setText("");
+    let promptText = "";
+    if (action === "screen") {
+      promptText = currentInput
+        ? `${currentInput}\n\nQuiero hacer una pausa de pantalla y descansar la vista.`
+        : "Quiero hacer una pausa de pantalla y descansar la vista unos momentos.";
+    } else if (action === "hydration") {
+      promptText = currentInput
+        ? `${currentInput}\n\nVoy a tomar un vaso de agua con calma para hidratarme.`
+        : "Voy a tomar un vaso de agua con calma para hidratarme.";
+    } else if (action === "stretch") {
+      promptText = currentInput
+        ? `${currentInput}\n\nQuiero estirar la espalda y relajar los hombros.`
+        : "Quiero estirar la espalda y relajar los hombros un momento.";
+    } else {
+      promptText = currentInput
+        ? `${currentInput}\n\nQuiero reconocer un pequeño detalle o momento positivo de mi día.`
+        : "Quiero reconocer un pequeño detalle o momento positivo de mi día.";
+    }
+    void ask(promptText, msgs);
+    scrollToInput();
   };
 
   useEffect(() => {
     const p = takePendingMessage();
-    if (p) void ask(p, msgs);
+    if (p) {
+      void ask(p, msgs);
+    } else {
+      // Si entra directamente a la página, enfoca y acomoda la vista al campo
+      scrollToInput();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per slug (component is keyed by slug)
   }, [slug]);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col px-5 py-8">
+    <main className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col px-3.5 py-4 sm:px-5 sm:py-8">
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex sm:justify-between">
         <Link
           to="/"
@@ -335,6 +403,189 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         </section>
       )}
 
+      {slug === "bienestar" && (
+        <section
+          aria-label="Pausa y cuidado de bienestar personal"
+          className="my-6 space-y-6"
+        >
+          {/* Guía interactiva de relajación corporal */}
+          <div className="flex flex-col items-center justify-center rounded-3xl border bg-card/60 p-6 shadow-sm backdrop-blur-xs text-center">
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Pausa corporal guiada
+            </span>
+            <h2 className="mt-1 text-lg font-medium text-foreground">
+              Soltar tensión y descargar el cuerpo
+            </h2>
+            <p className="mt-1 max-w-md text-sm text-muted-foreground">
+              Una breve pausa para recorrer hombros, manos, espalda y pies, devolviendo ligereza a tu jornada.
+            </p>
+
+            <div className="my-6 flex flex-col items-center justify-center">
+              <div
+                className={`relative flex size-36 sm:size-40 items-center justify-center rounded-full border-2 transition-all duration-700 ${
+                  bodyRelaxation.isActive
+                    ? "border-primary/60 bg-primary/10 shadow-lg shadow-primary/15 scale-105"
+                    : "border-primary/20 bg-secondary/50"
+                }`}
+              >
+                <div className="flex flex-col items-center gap-1 px-4 text-center">
+                  <Heart
+                    className={`size-7 text-primary transition-transform duration-500 ${
+                      bodyRelaxation.isActive ? "scale-110 animate-pulse" : ""
+                    }`}
+                  />
+                  <span className="text-xs font-medium text-foreground">
+                    {bodyRelaxation.isActive
+                      ? bodyRelaxation.currentStep.zone
+                      : "Pausa en calma"}
+                  </span>
+                </div>
+              </div>
+
+              {bodyRelaxation.isActive && (
+                <div className="mt-4 max-w-sm px-4">
+                  <p className="text-sm font-medium text-primary">
+                    {bodyRelaxation.currentStep.instruction}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Estación {bodyRelaxation.stepIndex + 1} de {bodyRelaxation.totalSteps}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div>
+              {bodyRelaxation.isActive ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={handleStopBodyRelaxation}
+                  aria-label="Terminar pausa corporal"
+                  className="h-12 gap-2 rounded-full border-primary/40 px-6 font-medium text-foreground hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Square className="size-4 shrink-0 fill-current" />
+                  <span>Terminar pausa</span>
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="default"
+                  size="lg"
+                  onClick={bodyRelaxation.start}
+                  aria-label="Iniciar pausa corporal con voz"
+                  className="h-12 gap-2 rounded-full px-6 font-medium shadow-sm"
+                >
+                  <Volume2 className="size-5 shrink-0" />
+                  <span>Iniciar pausa con voz</span>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Tarjetas de micro-pausas interactivas */}
+          <div className="rounded-3xl border bg-card/60 p-5 shadow-sm backdrop-blur-xs">
+            <div className="flex flex-col gap-1 text-center sm:text-left">
+              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                Micro-pausas de autocuidado
+              </span>
+              <h3 className="text-base font-medium text-foreground">
+                Pequeños gestos para tu momento actual
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Elige uno para acompañarte o escribe tu propio mensaje libremente.
+              </p>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleWellnessAction("screen")}
+                disabled={pending || bodyRelaxation.isActive}
+                aria-label="Pausa de pantalla y descanso visual"
+                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
+                  <Eye className="size-4" />
+                </div>
+                <div className="w-full">
+                  <span className="block text-sm font-medium text-foreground">
+                    Descanso visual
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
+                    Apartar la vista de pantallas y soltar la tensión ocular.
+                  </span>
+                </div>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleWellnessAction("hydration")}
+                disabled={pending || bodyRelaxation.isActive}
+                aria-label="Hidratación consciente"
+                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
+                  <Droplets className="size-4" />
+                </div>
+                <div className="w-full">
+                  <span className="block text-sm font-medium text-foreground">
+                    Hidratación consciente
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
+                    Tomar un vaso de agua despacio para reanimar el cuerpo.
+                  </span>
+                </div>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleWellnessAction("stretch")}
+                disabled={pending || bodyRelaxation.isActive}
+                aria-label="Estiramiento suave"
+                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
+                  <Sparkles className="size-4" />
+                </div>
+                <div className="w-full">
+                  <span className="block text-sm font-medium text-foreground">
+                    Estiramiento suave
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
+                    Desentumecer hombros y espalda en un minuto.
+                  </span>
+                </div>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleWellnessAction("gratitude")}
+                disabled={pending || bodyRelaxation.isActive}
+                aria-label="Reconocer el día"
+                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
+                  <Heart className="size-4" />
+                </div>
+                <div className="w-full">
+                  <span className="block text-sm font-medium text-foreground">
+                    Reconocer el día
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
+                    Agradecer o valorar un pequeño gesto grato de hoy.
+                  </span>
+                </div>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+
       <Conversation
         aria-label="Conversación"
         aria-live="polite"
@@ -397,12 +648,12 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         />
       </Conversation>
 
-      {!mindfulness.isActive && (
-        <>
+      {!mindfulness.isActive && !bodyRelaxation.isActive && (
+        <div ref={inputContainerRef} className="mt-4 sm:mt-6 scroll-mt-6">
           <PromptInput
             onSubmit={({ text: value }) => send(value)}
             maxFiles={0}
-            className="mt-6 [&_[data-slot=input-group]]:rounded-3xl [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-sm"
+            className="[&_[data-slot=input-group]]:rounded-3xl [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-sm"
           >
             <PromptInputTextarea
               aria-label="Tu mensaje"
@@ -505,7 +756,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
               ? "Demostración sin IA · frases simuladas según palabras clave; pueden no encajar. No se guardan las conversaciones."
               : "Las respuestas las genera una inteligencia artificial y no sustituyen a un profesional. Tus mensajes se envían a un servicio de IA (Google Gemini) solo para responder; no se guardan las conversaciones. Si el servicio no está disponible, verás respuestas simuladas sin IA."}
           </p>
-        </>
+        </div>
       )}
     </main>
   );

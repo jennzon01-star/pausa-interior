@@ -64,11 +64,14 @@ export const topics: Topic[] = [
     slug: "bienestar",
     title: "Cuidar mi bienestar personal",
     icon: "🌱",
-    intro: "Pequeños gestos sostienen mucho: descanso, agua, movimiento, algo que disfrutes.",
+    intro:
+      "Pequeños gestos sostienen mucho: descansar la vista, tomar agua, soltar el cuerpo o darte un momento para ti. Cuéntame cómo estás hoy o elige una micro-pausa.",
     replies: [
       "Qué bueno que te dediques este momento.",
       "Un vaso de agua o unos minutos al aire libre pueden ser un buen comienzo.",
       "Cuidarte no es un lujo, es parte del camino.",
+      "Aflojar los hombros y respirar un instante ya es un avance significativo.",
+      "Tomarse un descanso breve renueva la energía y la claridad mental.",
     ],
   },
 ];
