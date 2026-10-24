@@ -518,49 +518,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
               </p>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleWellnessAction("shoulders")}
-                disabled={pending || bodyRelaxation.isActive}
-                aria-label="Rotación de hombros hacia adelante y atrás"
-                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
-                  <RotateCcw className="size-4" />
-                </div>
-                <div className="w-full">
-                  <span className="block text-sm font-medium text-foreground">
-                    Rotación de hombros
-                  </span>
-                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
-                    Círculos suaves adelante y atrás para soltar la carga del cuello.
-                  </span>
-                </div>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleWellnessAction("wrists")}
-                disabled={pending || bodyRelaxation.isActive}
-                aria-label="Círculos en las muñecas y manos"
-                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
-                  <Sparkles className="size-4" />
-                </div>
-                <div className="w-full">
-                  <span className="block text-sm font-medium text-foreground">
-                    Círculos en muñecas
-                  </span>
-                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
-                    Girar muñecas y estirar dedos para descansar del teclado y móvil.
-                  </span>
-                </div>
-              </Button>
-
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <Button
                 type="button"
                 variant="outline"
@@ -599,48 +557,6 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                   </span>
                   <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
                     Tomar un vaso de agua despacio para reanimar el cuerpo.
-                  </span>
-                </div>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleWellnessAction("stretch")}
-                disabled={pending || bodyRelaxation.isActive}
-                aria-label="Estiramiento de espalda"
-                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
-                  <Sparkles className="size-4" />
-                </div>
-                <div className="w-full">
-                  <span className="block text-sm font-medium text-foreground">
-                    Estirar la espalda
-                  </span>
-                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
-                    Abrir el pecho y alargar la columna suavemente.
-                  </span>
-                </div>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleWellnessAction("neck")}
-                disabled={pending || bodyRelaxation.isActive}
-                aria-label="Cuello y mandíbula relajados"
-                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
-                  <Brain className="size-4" />
-                </div>
-                <div className="w-full">
-                  <span className="block text-sm font-medium text-foreground">
-                    Cuello y mandíbula
-                  </span>
-                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
-                    Inclinar la cabeza a los lados y aflojar la tensión dental.
                   </span>
                 </div>
               </Button>
