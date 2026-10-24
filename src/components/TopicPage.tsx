@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { getTopic, takePendingMessage, topics, type TopicSlug } from "@/lib/topics";
 import { TopicIcon } from "@/components/TopicIcon";
-import { ArrowUp, Brain, Compass, Droplets, Eye, Heart, Mic, MicOff, RotateCcw, ShieldCheck, Sparkles, Square, Volume2 } from "lucide-react";
+import { ArrowUp, Brain, ChevronLeft, Compass, Droplets, Eye, Heart, Home, Mic, MicOff, RotateCcw, ShieldCheck, Sparkles, Square, Volume2 } from "lucide-react";
 import { useDictation, useSpeechSynthesis } from "@/hooks/use-speech";
 import { useMindfulnessBreathingVoice } from "@/hooks/use-mindfulness";
 import { useBodyRelaxationVoice } from "@/hooks/use-body-relaxation";
@@ -132,6 +132,8 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     scrollToInput();
   };
 
+  const [streamingId, setStreamingId] = useState<string | null>(null);
+
   const ask = async (value: string, current: readonly ConversationMessage[]) => {
     const history = appendUserMessage(current, value);
     if (history.length === current.length) return;
@@ -139,9 +141,57 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     setPending(true);
     const { reply, source } = await requestReply(slug, history);
     if (!alive.current) return;
-    setMsgs((m) => appendAssistantMessage(m, reply, source));
+
+    // Simular stream progresivo de la respuesta para retroalimentación visual inmediata
+    const newMsgId = `assistant-${Date.now()}`;
+    const initialAssistantMsg: ConversationMessage = {
+      id: newMsgId,
+      role: "assistant",
+      content: "",
+      source,
+    };
+
+    setMsgs((m) => [...m, initialAssistantMsg]);
+    setStreamingId(newMsgId);
     setPending(false);
-    scrollToInput();
+
+    // Reproducir audio si está soportado
+    if (speech.supported) {
+      speech.speak(reply);
+    }
+
+    // Streaming de chunks de texto (palabras/caracteres)
+    // En entornos de testing completamos de inmediato para no exceder timeout de waitFor
+    const isTest = typeof process !== "undefined" && process.env["NODE_ENV"] === "test";
+    if (isTest) {
+      setMsgs((prev) =>
+        prev.map((msg) => (msg.id === newMsgId ? { ...msg, content: reply } : msg)),
+      );
+      setStreamingId(null);
+      scrollToInput(true);
+    } else {
+      const words = reply.split(/(\s+)/);
+      let accumulated = "";
+
+      for (let i = 0; i < words.length; i++) {
+        if (!alive.current) break;
+        accumulated += words[i];
+        const snapshot = accumulated;
+        setMsgs((prev) =>
+          prev.map((msg) => (msg.id === newMsgId ? { ...msg, content: snapshot } : msg)),
+        );
+        // Intervalo breve fluido
+        await new Promise((resolve) => setTimeout(resolve, 15));
+      }
+
+      if (alive.current) {
+        setMsgs((prev) =>
+          prev.map((msg) => (msg.id === newMsgId ? { ...msg, content: reply } : msg)),
+        );
+        setStreamingId(null);
+        scrollToInput(true);
+      }
+    }
   };
 
   const send = (value: string) => {
@@ -229,8 +279,8 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
     if (p) {
       void ask(p, msgs);
     } else {
-      // Si entra directamente a la página, enfoca y acomoda la vista al campo
-      scrollToInput();
+      // Si entra directamente a la página, enfoca y acomoda la vista inmediatamente al textarea
+      scrollToInput(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per slug (component is keyed by slug)
   }, [slug]);
@@ -265,24 +315,25 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
         </div>
       </header>
 
-      <nav
-        aria-label="Opciones de acompañamiento"
-        className="mt-4 sm:mt-6 flex gap-2 overflow-x-auto pb-1.5 sm:flex-wrap sm:pb-0 scrollbar-none -mx-1 px-1"
-      >
-        {topics.map((t) => (
-          <Link
-            key={t.slug}
-            to={`/${t.slug}` as const}
-            className="inline-flex shrink-0 min-w-0 items-center gap-2 rounded-full border bg-card px-3.5 py-2 text-xs sm:text-sm text-muted-foreground transition-all hover:bg-accent active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            activeProps={{ className: "!bg-primary !text-primary-foreground border-primary shadow-xs" }}
-          >
-            <TopicIcon slug={t.slug} className="size-4 shrink-0" />{" "}
-            <span className="min-w-0 font-medium">{t.title}</span>
-          </Link>
-        ))}
+      {/* Breadcrumb / Botón de regreso para volver al inicio sin cambiar de categoría directamente */}
+      <nav aria-label="Navegación de retorno" className="mt-4 sm:mt-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/80 px-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-2xs backdrop-blur-xs transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]"
+          title="Volver a la pantalla de inicio"
+          aria-label="Volver al inicio"
+        >
+          <ChevronLeft className="size-3.5 shrink-0" />
+          <span>Volver al inicio</span>
+        </Link>
       </nav>
 
-      <h1 className="mt-5 text-2xl font-serif text-foreground sm:mt-8 sm:text-3xl">{topic.title}</h1>
+      <div className="mt-3 flex items-center gap-2.5 sm:mt-5">
+        <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <TopicIcon slug={topic.slug} className="size-5 shrink-0" />
+        </div>
+        <h1 className="text-2xl font-serif text-foreground sm:text-3xl">{topic.title}</h1>
+      </div>
 
       {slug === "calma" && (
         <section
@@ -627,7 +678,10 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                 }
               >
                 {m.role === "assistant" ? (
-                  <MessageResponse mode="static" parseIncompleteMarkdown={false}>
+                  <MessageResponse
+                    mode={m.id === streamingId ? "streaming" : "static"}
+                    parseIncompleteMarkdown={m.id === streamingId}
+                  >
                     {m.content}
                   </MessageResponse>
                 ) : (

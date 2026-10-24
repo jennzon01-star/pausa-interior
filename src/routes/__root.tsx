@@ -118,9 +118,22 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isLoading = useRouterState({ select: (s) => s.status === "pending" || s.isLoading });
 
   return (
     <QueryClientProvider client={queryClient}>
+      {isLoading && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center bg-primary/90 text-primary-foreground py-1 text-xs font-medium backdrop-blur-xs transition-opacity shadow-xs"
+        >
+          <span className="flex items-center gap-2">
+            <span className="size-2 rounded-full bg-primary-foreground animate-ping" />
+            Cargando espacio…
+          </span>
+        </div>
+      )}
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
