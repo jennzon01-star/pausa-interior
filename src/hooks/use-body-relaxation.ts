@@ -119,6 +119,19 @@ export function useBodyRelaxationVoice() {
     };
   }, []);
 
+  const goToStep = useCallback(
+    (index: number) => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      activeRef.current = true;
+      setIsActive(true);
+      runStep(index);
+    },
+    [runStep],
+  );
+
   const currentStep = BODY_RELAX_STEPS[stepIndex]!;
 
   return {
@@ -126,8 +139,10 @@ export function useBodyRelaxationVoice() {
     currentStep,
     stepIndex,
     totalSteps: BODY_RELAX_STEPS.length,
+    steps: BODY_RELAX_STEPS,
     supported,
     start,
     stop,
+    goToStep,
   };
 }
