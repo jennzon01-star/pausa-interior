@@ -74,6 +74,12 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
   const considerAlternatives =
     /\b(alternativa\w*|opcion\w*|posibilidad\w*|caminos?\b|otros caminos|otras vias)/.test(text);
 
+  const wellnessShoulders =
+    /\b(hombro\w*|giro\w* de hombro\w*|rotar hombro\w*)\b/.test(text);
+
+  const wellnessWrists =
+    /\b(muneca\w*|mano\w*|dedo\w*|articulacion\w*)\b/.test(text);
+
   const wellnessScreen =
     /\b(pantalla|vista|ojos?|descanso visual|fatiga visual)\b/.test(text);
 
@@ -120,6 +126,16 @@ export const respondWithDemo: ConversationResponder = ({ messages }) => {
       "Para considerar alternativas no hace falta una solución perfecta; basta con identificar un primer paso viable y realista.",
       "Podemos explorar dos o tres caminos distintos y ver cuál te genera más serenidad y menos desgaste.",
       "Siempre hay más de una manera de abordar una misma situación. Mirarlas con calma ayuda a elegir sin presión.",
+    ]);
+  if (wellnessShoulders)
+    return choose([
+      "Hacer 3 giros suaves hacia atrás y luego 3 hacia adelante abre el pecho y afloja de inmediato la carga del cuello.",
+      "Subir los hombros hacia las orejas y dejarlos caer de golpe soltando el aire libera muchísima tensión acumulada.",
+    ]);
+  if (wellnessWrists)
+    return choose([
+      "Girar las muñecas en círculos lentos y estirar los dedos hacia atrás alivia enormemente la sobrecarga del ratón o el móvil.",
+      "Abrir bien las palmas como si tocaras una pared y luego sacudir suavemente las manos devuelve la soltura a los brazos.",
     ]);
   if (wellnessScreen)
     return choose([
