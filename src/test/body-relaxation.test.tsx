@@ -47,7 +47,7 @@ describe("useBodyRelaxationVoice", () => {
     const { result } = renderHook(() => useBodyRelaxationVoice());
     expect(result.current.isActive).toBe(false);
     expect(result.current.stepIndex).toBe(0);
-    expect(result.current.totalSteps).toBe(5);
+    expect(result.current.totalSteps).toBe(7);
   });
 
   it("starts guided relaxation and speaks step", () => {
@@ -57,7 +57,7 @@ describe("useBodyRelaxationVoice", () => {
     });
 
     expect(result.current.isActive).toBe(true);
-    expect(result.current.currentStep.zone).toBe("Rotación de hombros");
+    expect(result.current.currentStep.zone).toBe("Hombros y cuello");
     expect(spoken.length).toBeGreaterThan(0);
   });
 
@@ -72,7 +72,7 @@ describe("useBodyRelaxationVoice", () => {
     });
 
     expect(result.current.stepIndex).toBe(1);
-    expect(result.current.currentStep.zone).toBe("Muñecas y manos");
+    expect(result.current.currentStep.zone).toBe("Rotación de hombros");
   });
 
   it("stops guided relaxation and resets", () => {

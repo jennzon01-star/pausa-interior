@@ -184,7 +184,7 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
   };
 
   const handleWellnessAction = (
-    action: "screen" | "hydration" | "stretch" | "gratitude" | "shoulders" | "wrists",
+    action: "screen" | "hydration" | "stretch" | "gratitude" | "shoulders" | "wrists" | "neck",
   ) => {
     if (pending) return;
     if (dictation.status === "listening") dictation.stop();
@@ -207,6 +207,10 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
       promptText = currentInput
         ? `${currentInput}\n\nQuiero rotar las muñecas y abrir las manos para aliviar la tensión.`
         : "Quiero rotar las muñecas y abrir las manos para aliviar la tensión.";
+    } else if (action === "neck") {
+      promptText = currentInput
+        ? `${currentInput}\n\nQuiero estirar suavemente el cuello e inclinar la cabeza a los lados para soltar la mandíbula.`
+        : "Quiero estirar suavemente el cuello e inclinar la cabeza a los lados para soltar la mandíbula.";
     } else if (action === "stretch") {
       promptText = currentInput
         ? `${currentInput}\n\nQuiero estirar la espalda y relajar los hombros.`
@@ -624,6 +628,27 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                   </span>
                   <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
                     Abrir el pecho y alargar la columna suavemente.
+                  </span>
+                </div>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleWellnessAction("neck")}
+                disabled={pending || bodyRelaxation.isActive}
+                aria-label="Cuello y mandíbula relajados"
+                className="group h-auto flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left whitespace-normal shadow-xs transition-all hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="flex size-9 items-center justify-center rounded-xl bg-secondary text-primary transition-transform group-hover:scale-105">
+                  <Brain className="size-4" />
+                </div>
+                <div className="w-full">
+                  <span className="block text-sm font-medium text-foreground">
+                    Cuello y mandíbula
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed font-normal text-muted-foreground">
+                    Inclinar la cabeza a los lados y aflojar la tensión dental.
                   </span>
                 </div>
               </Button>

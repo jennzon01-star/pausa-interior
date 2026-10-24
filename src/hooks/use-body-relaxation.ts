@@ -9,29 +9,39 @@ export type BodyRelaxStep = {
 
 const BODY_RELAX_STEPS: BodyRelaxStep[] = [
   {
-    zone: "Rotación de hombros",
-    instruction: "Rueda los hombros en círculos amplios: primero 3 veces hacia atrás y luego 3 hacia adelante.",
-    voiceText: "Gira tus hombros en círculos hacia atrás, sintiendo cómo se abre el pecho. Ahora hacia adelante, soltando el peso.",
+    zone: "Hombros y cuello",
+    instruction: "Baja los hombros suavemente, suelta la mandíbula y descansa el cuello sin tensión.",
+    voiceText: "Baja los hombros con suavidad, suelta la mandíbula y deja descansar tu cuello.",
   },
   {
-    zone: "Muñecas y manos",
+    zone: "Rotación de hombros",
+    instruction: "Rueda los hombros en círculos amplios: primero 3 veces hacia atrás y luego 3 hacia adelante.",
+    voiceText: "Gira tus hombros en círculos hacia atrás, abriendo el pecho, y luego hacia adelante para soltar la carga.",
+  },
+  {
+    zone: "Manos y brazos",
+    instruction: "Abre y afloja tus manos sobre las piernas o la mesa; nota cómo se descargan.",
+    voiceText: "Abre y afloja tus manos. Nota cómo se descargan los brazos.",
+  },
+  {
+    zone: "Muñecas y dedos",
     instruction: "Entrelaza los dedos y rota las muñecas suavemente en círculos; luego abre y estira bien las palmas.",
     voiceText: "Mueve tus muñecas en círculos suaves. Abre y cierra las manos para liberar la fatiga del teclado y el móvil.",
   },
   {
-    zone: "Cuello y mandíbula",
-    instruction: "Deja caer la oreja hacia el hombro con suavidad, relaja la mandíbula y respira profundo.",
-    voiceText: "Inclina suavemente tu cuello hacia un lado y luego al otro. Suelta la mandíbula y entreabre los labios.",
+    zone: "Espalda y pecho",
+    instruction: "Apóyate cómodamente en el respaldo, siente cómo el pecho y la espalda se expanden al respirar.",
+    voiceText: "Siente el apoyo en tu espalda. Permite que el pecho se relaje y se abra con cada respiración.",
   },
   {
-    zone: "Espalda y apertura",
-    instruction: "Lleva los codos hacia atrás para expandir el pecho, sostén 3 segundos y regresa al centro.",
-    voiceText: "Abre suavemente el pecho llevando los codos hacia atrás. Siente cómo se alivia la espalda alta.",
+    zone: "Estiramiento lateral",
+    instruction: "Eleva un brazo con suavidad e inclina el torso levemente hacia el lado opuesto; luego cambia de lado.",
+    voiceText: "Estira un brazo hacia arriba y déjate caer un poco de lado. Siente cómo se alarga tu costado con suavidad.",
   },
   {
-    zone: "Pies y enraizamiento",
-    instruction: "Apoya firmemente las plantas de los pies, mueve los dedos dentro del calzado y siente el suelo.",
-    voiceText: "Siente el apoyo firme de tus pies en el suelo. Todo tu cuerpo encuentra estabilidad y reposo.",
+    zone: "Pies y piernas",
+    instruction: "Apoya bien las plantas de los pies sobre el suelo y siente la firmeza y estabilidad de la tierra.",
+    voiceText: "Siente tus pies en el suelo, firmes y en descanso.",
   },
 ];
 
