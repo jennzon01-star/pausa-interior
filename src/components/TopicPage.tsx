@@ -464,23 +464,10 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                     }`}
                   />
                   <span className="text-xs font-medium text-foreground">
-                    {bodyRelaxation.isActive
-                      ? bodyRelaxation.currentStep.zone
-                      : "Pausa en calma"}
+                    {bodyRelaxation.isActive ? "Escucha la guía" : "Pausa en calma"}
                   </span>
                 </div>
               </div>
-
-              {bodyRelaxation.isActive && (
-                <div className="mt-4 max-w-sm px-4">
-                  <p className="text-sm font-medium text-primary">
-                    {bodyRelaxation.currentStep.instruction}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Estación {bodyRelaxation.stepIndex + 1} de {bodyRelaxation.totalSteps}
-                  </p>
-                </div>
-              )}
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -506,63 +493,15 @@ function TopicConversation({ slug }: { slug: TopicSlug }) {
                   className="h-12 gap-2 rounded-full px-6 font-medium shadow-sm"
                 >
                   <Volume2 className="size-5 shrink-0" />
-                  <span>Iniciar pausa completa con voz</span>
+                  <span>Iniciar pausa con voz</span>
                 </Button>
               )}
             </div>
-
-            {/* Lista interactiva de todos los ejercicios dentro de la ventana de pausa guiada */}
-            <div className="mt-6 w-full max-w-xl border-t border-border/60 pt-5">
-              <div className="flex items-center justify-between text-left">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Ejercicios de la pausa
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {bodyRelaxation.totalSteps} pasos de alivio
-                </span>
-              </div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2 text-left">
-                {bodyRelaxation.steps.map((step, idx) => {
-                  const isCurrent = bodyRelaxation.isActive && bodyRelaxation.stepIndex === idx;
-                  return (
-                    <button
-                      key={step.zone}
-                      type="button"
-                      onClick={() => bodyRelaxation.goToStep(idx)}
-                      className={`flex flex-col gap-1 rounded-2xl border p-3 text-left transition-all active:scale-[0.98] cursor-pointer ${
-                        isCurrent
-                          ? "border-primary bg-primary/10 shadow-xs ring-1 ring-primary"
-                          : "border-border/70 bg-card/80 hover:border-primary/40 hover:bg-accent/50"
-                      }`}
-                      aria-label={`Ir al ejercicio: ${step.zone}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                          <span
-                            className={`flex size-4 items-center justify-center rounded-full text-[10px] font-bold ${
-                              isCurrent
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {idx + 1}
-                          </span>
-                          {step.zone}
-                        </span>
-                        {isCurrent && (
-                          <span className="text-[10px] font-medium text-primary uppercase tracking-wider animate-pulse">
-                            En curso
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs leading-relaxed text-muted-foreground line-clamp-2">
-                        {step.instruction}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            {bodyRelaxation.isActive && (
+              <span className="mt-3 text-xs text-muted-foreground">
+                Paso {bodyRelaxation.stepIndex + 1} de {bodyRelaxation.totalSteps} · Cierra los ojos y sigue la voz a tu ritmo
+              </span>
+            )}
           </div>
 
           {/* Tarjetas de micro-pausas interactivas */}
